@@ -1,0 +1,3 @@
+﻿查看某个端口被那个进程占用：
+	1.netstat -ano   <根据端口号查询pid>
+	2.Taskkill /pid [进程码] -t -f  
