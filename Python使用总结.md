@@ -16,3 +16,12 @@ Python基础知识总结归纳
         print str[-3:-1] #截取倒数第三位与倒数第一位之前的字符
         print str[-3:] #截取倒数第三位到结尾
         print str[:-5:-3] #逆序截取，具体啥意思没搞明白？
+3.列表转化为字符串时，如果需要在字符串中添加间隔符：
+        '|'.join(str(id) for id in List) #  '|'是间隔符，在list中每个元素之间添加间隔符。
+4.对一些特定符号进行替换时：借助 translaete()函数
+        <!-- 比如中英文替换 -->
+        title = '印度唯一一艘航母发生严重火灾，\:/|*？《》印度:自己能?修好它*吗|军情观察'
+        table = {ord(f): ord(t) for f, t in zip(
+                u'    ：？《》',
+                u'\/|*:?<>')}
+        titleFinally = title.translate(table)

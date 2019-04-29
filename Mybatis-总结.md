@@ -45,4 +45,7 @@ Mybatis的学习总结
                   <property name="Oracle" value="oracle" /> 
                 </databaseIdProvider>
         注意一个细节：例如一个函数 在对应的mapper.xml文件中有3个对应的sql语句，第一个没有带 databaseId；第二个databaseId 代表是mysql下的sql；第三个databaseId代表oracle数据库的sql，单 当前连接环境为 mysql时，它会选出带有mysql标识的sql以及没有指定databaseId的语句，再从中选出最精确地那个sql语句。
-        
+    14.mapper接口文件可以不绑定xml映射文件，可以直接在mapper接口中，在对应的方法前添加注释：
+            @Select("select * from employee where employeeId = #{id} ")
+            public Employee getEmployeeById(int id);
+    
