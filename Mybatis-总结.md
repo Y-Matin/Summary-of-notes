@@ -48,4 +48,7 @@ Mybatis的学习总结
     14.mapper接口文件可以不绑定xml映射文件，可以直接在mapper接口中，在对应的方法前添加注释：
             @Select("select * from employee where employeeId = #{id} ")
             public Employee getEmployeeById(int id);
+    15.在增删改操作中，mybatis支持一下类型的返回值：int、Integer、boolean. 无须在xml文件中添加返回类型，而且也不能添加返回类型。只有查才提供returnType属性。
+    16.通过sqlSessionFactory.openSession(); 得到的sqlsession不能自动提交更改，需要手动提交。
+       也可以通过：sqlSessionFactory.openSession(true); 这种方式 带boolean的参数 来定义是否自动提交。
     
