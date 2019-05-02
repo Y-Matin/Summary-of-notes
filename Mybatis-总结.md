@@ -51,4 +51,113 @@ Mybatis的学习总结
     15.在增删改操作中，mybatis支持一下类型的返回值：int、Integer、boolean. 无须在xml文件中添加返回类型，而且也不能添加返回类型。只有查才提供returnType属性。
     16.通过sqlSessionFactory.openSession(); 得到的sqlsession不能自动提交更改，需要手动提交。
        也可以通过：sqlSessionFactory.openSession(true); 这种方式 带boolean的参数 来定义是否自动提交。
+    17.获取自增主键的值：
+            1.useGenneratedKeys 的值设置为 true, 表明 使用自增主键获取主键值策略。
+            2.keyProperty 的值 为 javaBean 中对应的 自增主键的成员变量名，表明 将自增主键的值封装给该类的这个成员变量。
+    18.对于oracle数据库，不能直接设置为自增，只能通过序列的方式来获取下一个数字。
+            所以要插入新的数据时，要先获取id的值。 在<insert> 标签中有一个子标签 <keySelect >这个标签可以用来获取主键的值。
+            <insert id="insertAuthor">  
+                <selectKey keyProperty="id" resultType="int" order="BEFORE">
+                    select CAST(RANDOM()*1000000 as INTEGER) a from SYSIBM.SYSDUMMY1
+                </selectKey>
+                insert into Author    (id, username, password, email,bio, favourite_section)  
+                values(#{id}, #{username}, #{password}, #{email}, #{bio}, #{favouriteSection,jdbcType=VARCHAR})
+            </insert>
+    19.对于函数的入参的的处理：
+            ⑴.一个入参：通常是通过 #{参数名} 的方式 来实现替换， 实际上 {}中填入任何字符也同样可以正常运行。
+            ⑵.多个入参：如果还是按照上面的 #{参数名}的方式 来实现替换，程序在运行时会报错：
+                         Cause: org.apache.ibatis.binding.BindingException: 
+                                Parameter 'id' not found. Available parameters are [arg1, arg0, param1, param2]   
+                        其原因是因为： mybatis把所有的入参都封装到一个map对象中，
+                                    key： param1.......paramN
+                                    value: 传入的参数值
+                                    #{}就是从map 中获取指定的key。
+                        解决方法一： 在sql语句中 将#{参数名}的方式改为@{param1}..........@{paramN}
+                        解决方法二： 在mapper接口文件中，抽象函数中 明确指定封装参数时 map的key，
+                                    key：使用@Param注解指定参数名
+                                    value：参数的值
+                                    通过#{指定的key}去除对应的参数值。
+                        推荐使用方法二，便于确定参数的具体含义。
+    20.mybatis参数处理源码解析：
+====================ParamNameResolver的构造函数,关注 name  ========================================> 
+            
+public ParamNameResolver(Configuration config, Method method) {
+final Class<?>[] paramTypes = method.getParameterTypes();
+final Annotation[][] paramAnnotations = method.getParameterAnnotations();
+final SortedMap<Integer, String> map = new TreeMap<>();
+int paramCount = paramAnnotations.length;
+// get names from @Param annotations
+for (int paramIndex = 0; paramIndex < paramCount; paramIndex++) {
+String name = null;
+
+//1.如果 参数 是含有注解的 ，就将 注解的value 赋值给name 
+for (Annotation annotation : paramAnnotations[paramIndex]) {
+    if (annotation instanceof Param) {
+    hasParamAnnotation = true;
+    name = ((Param) annotation).value();
+    break;
+    }
+}
+if (name == null) {
     
+    //2.config 是指全局配置中的 useActualParamName 属性 作用是：将方法中实际声明的变量名作为 参数名。
+    if (config.isUseActualParamName()) {
+    name = getActualParamName(method, paramIndex);
+    }
+    if (name == null) {
+
+    // use the parameter index as the name ("0", "1", ...)
+    // 3.name = 1.....N
+    name = String.valueOf(map.size());
+    }
+}
+map.put(paramIndex, name);
+}
+names = Collections.unmodifiableSortedMap(map);
+}
+=======================解析总结=========================================>        
+        map：<key,value> 含义： 含顺序的参数名
+            key：是 Integer类型，代表 参数名的 索引 ，如：0,1... 
+            value：name的值
+                 ⑴. 如果是含有注解的 ，将注解里面的 值 作为 赋值给name，
+                 ⑵. 如果不含有注解：
+                        ①. 查看全局变量 ：useActualParamName<jdk 1.8> 是否已配置， name = 参数名
+                        ②.name = map.size  相当于当前元素的索引
+                {0=id,1=name,2=2......}
+=========================一下是参数的值与对应的参数名绑定的处理========================================>
+public Object getNamedParams(Object[] args) {
+    //args 里面的值就是具体入参的值，可能包含 基本类型和对象类型
+    //names 是一个Map类型，其值来源为上面构造方法。 形如：{0=id,1=name,2=2......}
+    final int paramCount = names.size();
+    if (args == null || paramCount == 0) {
+      return null;
+    } else if (!hasParamAnnotation && paramCount == 1) {
+        //1.如果只有一个入参，就直接把该值返回，并没有封装在map中 
+      return args[names.firstKey()];
+    } else {
+      final Map<String, Object> param = new ParamMap<>();
+      int i = 0;
+      for (Map.Entry<Integer, String> entry : names.entrySet()) {
+          //names集合中的value作为key，names集合中的key只是作为args数组取值的参考
+        param.put(entry.getValue(), args[entry.getKey()]);
+        // add generic param names (param1, param2, ...)
+        //GENERIC_NAME_PREFIX:param
+        final String genericParamName = GENERIC_NAME_PREFIX + String.valueOf(i + 1);
+        // ensure not to overwrite parameter named with @Param
+        //同时也额外提供paramN的参数名。
+        //效果：#{指定的key} 或者 #{paraN} 
+        if (!names.containsValue(genericParamName)) {
+          param.put(genericParamName, args[entry.getKey()]);
+        }
+        i++;
+      }
+      return param;
+    }
+  }
+===================================解析总结=====================================================================>
+        //args 里面的值就是具体入参的值，可能包含 基本类型和对象类型
+        //names 是一个Map类型，其值来源为上面构造方法。 形如：{0=id,1=name,2=2......}
+            //1.如果只有一个入参，就直接把该值返回，并没有封装在map中 
+            //names集合中的value作为key，names集合中的key只是作为args数组取值的参考
+            //同时也额外提供paramN的参数名。
+            //效果：#{指定的key} 或者 #{paraN} 
