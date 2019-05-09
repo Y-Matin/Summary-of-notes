@@ -77,10 +77,20 @@ Mybatis的学习总结
                                     key：使用@Param注解指定参数名
                                     value：参数的值
                                     通过#{指定的key}去除对应的参数值。
-                        推荐使用方法二，便于确定参数的具体含义。
+            ⑶.POJO：如果是参数全是业务逻辑的数据模型，可以直接出入POJO。#{属性名}取出传入POJO中的属性值
+            ⑷.TO(Tranfer Object)数据传输对象：参数不是属于数据模型，可以自己新建一个数据对象。
+                  如：Page{
+                           int pageSize;
+                           int PageCurernt;
+                           int PageCOunt;
+                          }
+            ⑸.需注意一个特殊的：但入参是一个集合类型：collection（list，set）或者是数组类型 。Mybatis会做特殊处理。
+                会把出入的集合或者数组封装在Map中
+                key: collection入参使用 "collection"作为key， 如果是list也可以使用"list"作为key
+                      数组 使用"array"作为key
+            推荐使用方法 2、3、4。便于确定参数的具体含义。
     20.mybatis参数处理源码解析：
-====================ParamNameResolver的构造函数,关注 name  ========================================> 
-            
+====================ParamNameResolver的构造函数,关注 name  ========================================>         
 public ParamNameResolver(Configuration config, Method method) {
 final Class<?>[] paramTypes = method.getParameterTypes();
 final Annotation[][] paramAnnotations = method.getParameterAnnotations();
@@ -89,7 +99,6 @@ int paramCount = paramAnnotations.length;
 // get names from @Param annotations
 for (int paramIndex = 0; paramIndex < paramCount; paramIndex++) {
 String name = null;
-
 //1.如果 参数 是含有注解的 ，就将 注解的value 赋值给name 
 for (Annotation annotation : paramAnnotations[paramIndex]) {
     if (annotation instanceof Param) {
@@ -98,8 +107,7 @@ for (Annotation annotation : paramAnnotations[paramIndex]) {
     break;
     }
 }
-if (name == null) {
-    
+if (name == null) {  
     //2.config 是指全局配置中的 useActualParamName 属性 作用是：将方法中实际声明的变量名作为 参数名。
     if (config.isUseActualParamName()) {
     name = getActualParamName(method, paramIndex);
@@ -161,3 +169,31 @@ public Object getNamedParams(Object[] args) {
             //names集合中的value作为key，names集合中的key只是作为args数组取值的参考
             //同时也额外提供paramN的参数名。
             //效果：#{指定的key} 或者 #{paraN} 
+=================================================================================================================>
+    21.#{} 与${}的区别和相似之处：
+            相同点：#{}和${}都可以从参数中取值，功能是一样的。
+            不同： #{}采用了预编译的形式，在sql语句中采用了 "?" 占位符， proparedStatment，可以防止sql注入
+                  ${}采用了直接替换的方式。会存在安全隐患。
+            使用方法：
+                  大多数情况下，我们都是用#{}从参数中取值
+                  原生jdbc不支持占位符的地方，我们可以用${}来进行取值。例如:表名.....
+    22.select标签：查询语句如果返回一个list，select标签中的resultType不是list类型，而是 list中元素的类型。
+    23.批量插入：  insert + foreach  动态sql 
+        <!--批量导入list 的使用 ，结合foreach 语句-->
+        <insert id="insertEmployeeList" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="employeeId">
+            insert into employee(departmentId,positionId,employeeName,employeeSex,employeeTel,employeeAddress,level)
+            values
+            <foreach collection="list" index="index" item="item" separator=",">
+                (
+                #{item.departmentId},
+                #{item.positionId},
+                #{item.employeeName},
+                #{item.employeeSex},
+                #{item.employeeTel},
+                #{item.employee_address},
+                #{item.level}
+                )
+            </foreach>
+        </insert>
+    
+
