@@ -31,3 +31,63 @@
     git rm --cached readme1.txt    删除readme1.txt的跟踪，并保留在本地。
     git rm --f readme1.txt    删除readme1.txt的跟踪，并且删除本地文件。
   不要误解了 .gitignore 文件的用途，该文件只能作用于 Untracked Files，也就是那些从来没有被 Git 记录过的文件（自添加以后，从未 add 及 commit 过的文件）。
+
+
+## 所有的Git 命令
+    add                     gc                      reflog
+    add--interactive        get-tar-commit-id       remote
+    am                      grep                    remote-ext
+    annotate                gui                     remote-fd
+    apply                   gui--askpass            remote-ftp
+    archimport              gui--askyesno           remote-ftps
+    archive                 gui.tcl                 remote-http
+    askpass                 hash-object             remote-https
+    bisect                  help                    repack
+    bisect--helper          http-backend            replace
+    blame                   http-fetch              request-pull
+    branch                  http-push               rerere
+    bundle                  imap-send               reset
+    cat-file                index-pack              rev-list
+    check-attr              init                    rev-parse
+    check-ignore            init-db                 revert
+    check-mailmap           instaweb                rm
+    check-ref-format        interpret-trailers      send-email
+    checkout                log                     send-pack
+    checkout-index          ls-files                serve
+    cherry                  ls-remote               sh-i18n--envsubst
+    cherry-pick             ls-tree                 shortlog
+    citool                  mailinfo                show
+    clean                   mailsplit               show-branch
+    clone                   merge                   show-index
+    commit                  merge-file              stage
+    commit-graph            merge-index             stash
+    commit-tree             merge-octopus           status
+    config                  merge-one-file          stripspace
+    count-objects           merge-ours              submodule
+    credential              merge-recursive         submodule--helper
+    credential-manager      merge-resolve           subtree
+    credential-store        merge-subtree           svn
+    credential-wincred      merge-tree              symbolic-ref
+    cvsexportcommit         mergetool               tag
+    cvsimport               mktag                   unpack-file
+    daemon                  mktree                  unpack-objects
+    describe                mv                      update
+    diff                    name-rev                update-git-for-windows
+    diff-files              notes                   update-index
+    diff-index              p4                      update-ref
+    diff-tree               pack-objects            update-server-info
+    difftool                pack-redundant          upload-archive
+    difftool--helper        pack-refs               upload-pack
+    fast-export             patch-id                var
+    fast-import             prune                   verify-commit
+    fetch                   prune-packed            verify-pack
+    fetch-pack              pull                    verify-tag
+    filter-branch           push                    web--browse
+    fmt-merge-msg           quiltimport             whatchanged
+    for-each-ref            read-tree               worktree
+    format-patch            rebase                  write-tree
+    fsck                    rebase--helper
+    fsck-objects            receive-pack
+  
+### git场景
+![git图片](./images/git.png)
