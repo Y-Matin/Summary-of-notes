@@ -37,3 +37,11 @@
 8. 在js中 通过this，寻找附近的其他标签：parent()寻找该标签的父标签，find(ele)在当前标签包含内容中寻找目标标签，first()方法返回第一个符合条件的标签，text()返回该标签的文本信息。
 
         $(this).parent().find("td").first().text()
+9. 但不便于在表单类提交时，可以通过js的方式，将该表单的提交事件放在该按钮的点击事件中：
+
+        <script >
+		$(document).on("click",".delete_btn",function () {
+                var action = $(this).attr("delete_url");
+                $("#delete_form").attr("action", action).submit();
+            })
+		</script>
