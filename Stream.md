@@ -25,3 +25,7 @@
 > 匹配 ：anyMatch、allMatch、moneMatch、findMatch、findFirst、findAny
 > 汇聚 ：reduce 
 > 收集器 ：toArray、collect 
+
+### 总结
+
+stream和collectors对象中都有排序，比较大小、取最大最小值的函数。
