@@ -10,4 +10,11 @@
 > 指标：/actuator/metrics
 > 健康检查：/actuator/health
 > 外部化配置：/actuator/configprops
+*** 
+- Web Flux（Netty）
+- Servlet 容器
 
+*** 
+- Servlet 容器
+  - Tomcat
+  - Jetty  
