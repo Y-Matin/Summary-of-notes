@@ -15,10 +15,13 @@
 #### Docker的常见操作 
    1. 安装docker 
         > systemctl install docker
+   2. 卸载docker
+        > yum remove docker
    2. 启动docker
         > systemctl start docker
    3. 将docker服务设置为开机启动
         > systemctl enable docker
+        ****
    4. 检索镜像
        - 默认是在docker hub上检索镜像
         > docker search 关键字  
@@ -30,4 +33,34 @@
         > docker images
    7. 删除本地镜像
         > docker rmi image-id
-   8. 
+        ***
+   8. 借助镜像，新增一个容器
+        > docker run --name container-name -d image-name  
+        eg: docker run –name myredis –d redis 
+        - "--name"：自定义容器名
+        - "-d"：后台运行
+        - "image-name":指定镜像模板
+   9. 查看运行中的容器
+        > docker ps  
+        docker ps -a 
+        - 加上"-a"可以看到所有容器
+   10. 停止运行中的容器
+        > docker stop container-name/container-id 
+   11. 启动已存在容器
+        > docker start container-name/container-id
+   12. 删除容器
+        > docker rm container-name/container_id
+   13. 端口映射(命令参数)
+        > -p 80:8080  
+          eg：docker run -d -p 80:8080 tomcat
+        - 将主机端口映射到容器内部的端口
+   14. 容器日志
+        > docer logs container-Name/container-id
+   15. 进入正在运行的容器目录
+        > docker exec -it container-id/container-name /bin/bash
+   16. 
+
+    
+### 更多命令
+https://docs.docker.com/engine/reference/commandline/docker/
+

@@ -17,7 +17,7 @@
 > 去重 ：distinct  
 > 排序 ：sorted
 > 截取 ：limit、skip  
-> 转换 ：map/flatMap 
+> 转换 ：map/flatMap   
 > 其他 ：peek(一般用于debug、打印日志等)
 #### 终止操作
 > 循环 : forEach  
