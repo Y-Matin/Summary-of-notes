@@ -22,8 +22,8 @@
 #### 终止操作
 > 循环 : forEach  
 > 计算 ：min、max、count、average  
-> 匹配 ：anyMatch、allMatch、moneMatch、findMatch、findFirst、findAny
-> 汇聚 ：reduce 
+> 匹配 ：anyMatch、allMatch、moneMatch、findMatch、findFirst、findAny  
+> 汇聚 ：reduce  
 > 收集器 ：toArray、collect 
 
 ### 总结

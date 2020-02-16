@@ -57,7 +57,7 @@
 :-:|:-:|:-:
 |静态方法引用|类名::staticMethod|(args) -> 类名.staticMethod(args)|
 |实例方法引用|inst::instMethod| (args) -> inst.instMethod(args)|
-|对象方法引用|类名::instMethod|(int,args) ->类名.instMethod(args)|
+|对象方法引用|类名::instMethod|(inst,args) ->类名.instMethod(args)|
 |构造方法引用|类名::new | (args) -> new 类名(args)|
 ### 什么是方法的引用
 > 方法引用是用来直接访问类或者实例的已经存在的方法或者构造方法，方法引用提供了一种**引用而不执行的方式**
