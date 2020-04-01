@@ -15,7 +15,7 @@
 #### 中间操作
 > 过滤 : filter  
 > 去重 ：distinct  
-> 排序 ：sorted
+> 排序 ：sorted  
 > 截取 ：limit、skip  
 > 转换 ：map/flatMap   
 > 其他 ：peek(一般用于debug、打印日志等)
