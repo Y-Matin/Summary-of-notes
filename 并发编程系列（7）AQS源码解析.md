@@ -17,3 +17,5 @@ compareAndSetState(int, int) 方法来操作以原子方式更新的int值。
 中发挥作用。只支持独占模式或者只支持共享模式的子类不必定义支持未使用模式的方法。
 
 此类通过支持独占模式的子类定义了一个嵌套的AbstractQueuedSynchronizer . ConditionObject
+
+- 继承 关系 
