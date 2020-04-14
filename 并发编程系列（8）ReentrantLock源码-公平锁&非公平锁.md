@@ -12,7 +12,7 @@
 
 -  ReentrantLock内部关系
 
-![](https://raw.githubusercontent.com/Y-Matin/Summary-of-notes/master/images/ReentrantLock_class.png)
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/ReentrantLock_class.png)
 
 - 1. ReentrantLock实现了Lock接口
 - 2. ReentrantLock有三个内部类(Sync,FairSync,NonFairSync)
@@ -45,7 +45,7 @@
 ***
 ### 2. 抽象Sync内部类结构如下：
 
-![](https://raw.githubusercontent.com/Y-Matin/Summary-of-notes/master/images/Sync.png)
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/Sync.png)
 
 - 由上面代码可以看出
 - 1. Sync 自己新建了一个lock抽象方法(由于ReentrantLock实现了Lock接口，需要实现lock()方法，所以调用Sync提供的lock(),具体执行的是它的子类的lock()逻辑)
@@ -126,7 +126,7 @@
   
 
 ### 5. 公平锁与非公平锁在获取锁的源码对比：
-![](https://raw.githubusercontent.com/Y-Matin/Summary-of-notes/master/images/compare_fair_nonfair.png)
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/compare_fair_nonfair.png)
 
 
 

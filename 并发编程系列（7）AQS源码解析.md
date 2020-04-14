@@ -24,3 +24,18 @@ AbstractQueuedSynchronizer --为实现依赖于先进先出(FIFO)的阻塞锁
 > 此类通过支持独占模式的子类定义了一个嵌套的AbstractQueuedSynchronizer . ConditionObject
 
 >继承 关系 
+
+
+- AQS中提供的判断队列是否有其他等待线程 方法 
+```java
+ public final boolean hasQueuedPredecessors() {
+        // The correctness of this depends on head being initialized
+        // before tail and on head.next being accurate if the current
+        // thread is first in queue.
+        Node t = tail; // Read fields in reverse initialization order
+        Node h = head;
+        Node s;
+        return h != t &&
+            ((s = h.next) == null || s.thread != Thread.currentThread());
+    }
+```
