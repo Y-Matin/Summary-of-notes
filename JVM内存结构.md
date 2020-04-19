@@ -8,6 +8,7 @@
     - [2.2. 方法区（Method Area）](#22-%e6%96%b9%e6%b3%95%e5%8c%bamethod-area)
     - [2.3. 程序计数器（Program Counter Register）](#23-%e7%a8%8b%e5%ba%8f%e8%ae%a1%e6%95%b0%e5%99%a8program-counter-register)
     - [2.4. 虚拟机栈](#24-%e8%99%9a%e6%8b%9f%e6%9c%ba%e6%a0%88)
+      - [2.4.1. 栈帧](#241-%e6%a0%88%e5%b8%a7)
     - [2.5. 本地方法栈（Native Method Stacks）](#25-%e6%9c%ac%e5%9c%b0%e6%96%b9%e6%b3%95%e6%a0%88native-method-stacks)
   - [3. JVM常见参数以及对应空间位置](#3-jvm%e5%b8%b8%e8%a7%81%e5%8f%82%e6%95%b0%e4%bb%a5%e5%8f%8a%e5%af%b9%e5%ba%94%e7%a9%ba%e9%97%b4%e4%bd%8d%e7%bd%ae)
   - [4. 内存管理](#4-%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86)
@@ -20,7 +21,7 @@
 > 3. OutOfMemoryError的异常到底涉及到运行时数据的哪块区域？该怎么解决呢？
 
 ### 2. JVM 内存结构
-![](JVM_detail.png.png)
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/JVM_detail.png)
 **方法区和堆是所有线程共享的内存区域；而java栈、本地方法栈和程序员计数器是运行是线程私有的内存区域。**
 
 #### 2.1. Java堆（Heap）
@@ -41,17 +42,23 @@
 **此内存区域是唯一一个在Java虚拟机规范中没有规定任何OutOfMemoryError情况的区域。**
 #### 2.4. 虚拟机栈
 1. Java虚拟机栈（Java Virtual Machine Stacks）也是线程私有的，它的生命周期与线程相同。虚拟机栈描述的是Java方法执行的内存模型：每个方法被执行的时候都会同时创建一个栈帧（Stack Frame）用于存储局部变量表、操作栈、动态链接、方法出口等信息。每一个方法被调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程。 
-![](stackFrame.jpg) 
-2. 局部变量表存放了编译期可知的各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型，它不等同于对象本身，根据不同的虚拟机实现，它可能是一个指向对象起始地址的引用指针，也可能指向一个代表对象的句柄或者其他与此对象相关的位置）和returnAddress类型（指向了一条字节码指令的地址）。
+   
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/stackFrame.jpg) 
+1. 局部变量表存放了编译期可知的各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型，它不等同于对象本身，根据不同的虚拟机实现，它可能是一个指向对象起始地址的引用指针，也可能指向一个代表对象的句柄或者其他与此对象相关的位置）和returnAddress类型（指向了一条字节码指令的地址）。
 
-3. 在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常
-4. 如果虚拟机栈可以动态扩展，当扩展时无法申请到足够的内存时会抛出OutOfMemoryError异常。
+2. 在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常
+3. 如果虚拟机栈可以动态扩展，当扩展时无法申请到足够的内存时会抛出OutOfMemoryError异常。
+##### 2.4.1. 栈帧
+1. 局部变量：用于存放方法参数和方法内部定义的局部变量
+2. 操作数栈：用于计算，做出栈，入栈操作
+3. 动态链接：栈帧持有一个指向方法区常量池中所属方法的引用。这个引用是为了支持动态连接。动态连接是指符号引用在运行时转化为直接引用。
+4. 返回地址：在方法退出之后，都需要返回到方法被调用的位置，程序才能继续执行，方法返回时可能需要在栈帧中保存一些信息
 #### 2.5. 本地方法栈（Native Method Stacks）
 1. 本地方法栈（Native Method Stacks）与虚拟机栈所发挥的作用是非常相似的，其区别不过是虚拟机栈为虚拟机执行Java方法（也就是字节码）服务，而本地方法栈则是为虚拟机使用到的Native方法服务。
 2. native 方法与 系统底层进行交付，比如本地的 DDL文件。
 3. 与虚拟机栈一样，本地方法栈区域也会抛出StackOverflowError和OutOfMemoryError异常。
 ### 3. JVM常见参数以及对应空间位置
-![](JVM-param.png)
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/JVM-param.png)
 **控制参数**
 - -Xms设置堆的最小空间大小。
 - -Xmx设置堆的最大空间大小。
