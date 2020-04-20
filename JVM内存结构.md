@@ -22,7 +22,10 @@
 
 ### 2. JVM 内存结构
 ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/JVM_detail.png)
+***
 **方法区和堆是所有线程共享的内存区域；而java栈、本地方法栈和程序员计数器是运行是线程私有的内存区域。**
+***
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/jvm-runData.png)
 
 #### 2.1. Java堆（Heap）
 1. Java堆（Java Heap）是Java虚拟机所管理的内存中最大的一块。
@@ -57,6 +60,8 @@
 1. 本地方法栈（Native Method Stacks）与虚拟机栈所发挥的作用是非常相似的，其区别不过是虚拟机栈为虚拟机执行Java方法（也就是字节码）服务，而本地方法栈则是为虚拟机使用到的Native方法服务。
 2. native 方法与 系统底层进行交付，比如本地的 DDL文件。
 3. 与虚拟机栈一样，本地方法栈区域也会抛出StackOverflowError和OutOfMemoryError异常。
+
+
 ### 3. JVM常见参数以及对应空间位置
 ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/JVM-param.png)
 **控制参数**
