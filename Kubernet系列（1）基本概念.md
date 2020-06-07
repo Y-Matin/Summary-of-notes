@@ -1,10 +1,20 @@
-<!-- ## Kubernet 系列   -->
-### 简介
+## Kubernet 系列（1）基本概念 
+<!-- TOC -->
+
+- [Kubernet 系列（1）基本概念](#kubernet-系列1基本概念)
+  - [1. 简介](#1-简介)
+  - [2. 架构图](#2-架构图)
+  - [3. 重要概念](#3-重要概念)
+    - [3.1. Kubernetes主要由以下几个核心组件组成：](#31-kubernetes主要由以下几个核心组件组成)
+    - [3.2. 除了核心组件，还有一些推荐的Add-ons：](#32-除了核心组件还有一些推荐的add-ons)
+
+<!-- /TOC -->
+### 1. 简介
 - Kubernetes是一个开源的，用于管理云平台中多个主机上的容器化的应用，Kubernetes的目标是让部署容器化的应用简单并且高效（powerful）,Kubernetes提供了应用部署，规划，更新，维护的一种机制。
 - Kubernetes一个核心的特点就是能够自主的管理容器来保证云平台中的容器按照用户的期望状态运行着（比如用户想让apache一直运行，用户不需要关心怎么去做，Kubernetes会自动去监控，然后去重启，新建，总之，让apache一直提供服务），管理员可以加载一个微型服务，让规划器来找到合适的位置，同时，Kubernetes也系统提升工具以及人性化方面，让用户能够方便的部署自己的应用（就像canary deployments）
-### 架构图
+### 2. 架构图
 ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/K8s架构图.png)
-### 重要概念
+### 3. 重要概念
 > 在这张系统架构图中，我们把服务分为运行在工作节点上的服务和组成集群级别控制板的服务。
 
 > Kubernetes节点有运行应用容器必备的服务，而这些都是受Master的控制。
@@ -12,7 +22,7 @@
 > 每次个节点上当然都要运行Docker。Docker来负责所有具体的映像下载和容器运行。
 
 
-####  Kubernetes主要由以下几个核心组件组成：
+#### 3.1. Kubernetes主要由以下几个核心组件组成：
 - **etcd**：保存了整个集群的状态；键值对数据库，存储k8s集群所有重要信息（持久化）
 - **apiserver**：提供了资源操作的唯一入口，并提供认证、授权、访问控制、API注册和发现等机制；
 - **controller manager**：负责维护集群的状态，比如故障检测、自动扩展、滚动更新等；维持副本期望数目。
@@ -23,7 +33,7 @@
 
 **官方提供的**
 
-#### 除了核心组件，还有一些推荐的Add-ons：
+#### 3.2. 除了核心组件，还有一些推荐的Add-ons：
 - **kube-dns**：负责为整个集群提供DNS服务
 - **Ingress Controller**：为服务提供外网入口（官方只能实现四层代理，Ingress可以实现七层代理）
 - **Heapster**：提供资源监控
@@ -34,4 +44,5 @@
   **高可用集群副本数据最好是>=3 （奇数个）**
 
   ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/k8s-master.png)
+  ****
   ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/k8s-node.png)
