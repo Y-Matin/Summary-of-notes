@@ -19,6 +19,23 @@
 - Flannel通过给每台宿主机分配一个子网的方式为容器提供虚拟网络，它基于Linux TUN/TAP，使用UDP封装IP包来创建overlay网络，并借助etcd维护网络的分配情况。
 - ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/flannel.png)
 #### 目的
-- Flannel设计目的就是为集群中所有节点重新规划IP地址的使用规则，从而使得不同节点上的容器能够获得"同属一个内网"且"不重复的"IP地址，并让属于不同节点上的容器能够直接通过内网IP通信。
-- 简单来说，它的功能是让集群中的不同节点主机创建的Docker容器都具有全集群唯一的虚拟IP地址。
+- Flannel设计目的就是为集群中所有节点重新规划IP地址的使用规则，**从而使得不同节点上的容器能够获得"同属一个内网"且"不重复的"IP地址，并让属于不同节点上的容器能够直接通过内网IP通信。**
+- 简单来说，它的功能是**让集群中的不同节点主机创建的Docker容器都具有全集群唯一的虚拟IP地址**。
+  
+#### Flannel与K8s的ectd关系
+- Flannel给节点分配IP地址段资源
+- 监控ectd中每个Pod的实际地址，并在内存中建立维护Pod节点路由表
+
+### 总结
+#### Pod内通信
+- 同一个Pod共享同一个网络命名空间，共享统一个Linux协议栈。
+#### Pod1至Pod2
+- Pod1与Pod2不在同一台主机，Pod的地址是与docker0在同一个网段的，但docker0网段与宿主机网卡是两个完全不同的IP网段，并且不同Node之间通信只能通过宿主机的物理网卡进行。将Pod的IP和所在Node的IP关联，通过这个关联让Pod可以互相访问
+- Pod1与Pod2在同一台机器，有docker0网桥直接转发请求至Pod2，不需要经过Flannel。
+#### Pod至Service通信
+- 基于性能考虑，全部为iptable维护和转发
+#### Pod至外网
+- Pod向外网发送请求，查找路由表，转发数据包到宿主机的网卡，宿主机完成路由选择后，iptable执行Masquerade，把源IP更改为宿主机网卡的IP，然后向外网服务器发送请求。
+#### 外网至Pod
+- 通过Service提供支持。
 
