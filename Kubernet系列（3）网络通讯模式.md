@@ -1,0 +1,24 @@
+<!-- ## kubernet系列（3）网络通讯模式 -->
+ 
+###  背景
+- Kubernetes的网络模式假定了所有Pod都在一个可以直接连通的**扁平的网络空间**中，这在GCE（Google COmpute Engine）里面是现成的网络模型，Kubernetes假定这个网络已经存在。
+- 而在私有云力搭建Kubernetes集群，就不能假定这个网络已经存在了，我们需要自己实现这个网络假设，将不同节点上的Docker容器之间的互相访问先打通，然后在运行Kubernetes。
+
+### 通讯方式 
+> 1. 同一个Pod内的多个容器之间
+- 由于同一Pod中会存在名为“pause”的容器，Pod中的容器都会共用这个网络栈，通过 **localhost+port** 即可访问其它容器。
+> 2. 各Pod之间的通讯
+- Overlay Network
+> 3. Pod与Service之间的通讯
+- 各节点的Iptable规则
+
+### Flannel 搭建扁平化网络
+#### 简介
+- 他的功能是让集群中不同节点主机创建的Docker容器都具有全集群唯一的虚拟IP地址
+- 这些IP地址之间建立一个覆盖网络（Over Network），通过这覆盖网络，将数据包原封不动的传递到目标容器内
+- Flannel通过给每台宿主机分配一个子网的方式为容器提供虚拟网络，它基于Linux TUN/TAP，使用UDP封装IP包来创建overlay网络，并借助etcd维护网络的分配情况。
+- ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/flannel.png)
+#### 目的
+- Flannel设计目的就是为集群中所有节点重新规划IP地址的使用规则，从而使得不同节点上的容器能够获得"同属一个内网"且"不重复的"IP地址，并让属于不同节点上的容器能够直接通过内网IP通信。
+- 简单来说，它的功能是让集群中的不同节点主机创建的Docker容器都具有全集群唯一的虚拟IP地址。
+

@@ -11,7 +11,7 @@
 > ReplicaSet跟ReplicationController没有本质的不同，只是名字不一样，并且**ReplicaSet支持集合式selector**。
 #### Deployment
 > 虽然ReplicaSet可以独立使用，但一般还是建议使用Deployment来自动管理ReplicaSet，这样就无需担心跟其他几只的不兼容问题，比如：ReplicaSet不支持rolling-update，但Deployment支持。
-### StatefulSet 
+### StatefulSet<状态集> 
 - docker 针对的是无状态服务，无需实时存储数据，即 容器A停止后，其他容器经过一段时间运行后，在把容器A启动，这时容器A依然可以正常工作，典型的有appache tomcat；
 
 -StatefulSet是为了解决有状态服务的问题。 有状态服务：mysql....
@@ -20,5 +20,14 @@
 - 稳定的网络标志，及Pod重新调度后，其PodName和HostName不变，基于Headless Service（即没有Cluster IP 的Service）来实现
 - 有序部署，有序扩展，即Pod是有顺序的，在部署或者扩展的时候要以及定义依次进行，（即从0到N-1，在下一个Pod运行之前的Pod必须是Running和Ready状态），基于init containers来实现
 - 有序收缩，有序删除（即从N-1到0）
+### DaemonSet<守护进程集>
+> DaemonSet 确保全部（或者一些）Node上运行一个Pod的副本。当有Node加入集群时，也会为他们新增一个Pod。当有Node从集群移除是，这些Pod也会被回收。删除DaemonSet将会删除它创建的所有Pod
+#### 典型用法：
+- 运行集群存储daemon，例如在每个Node上运行gluserd、ceph。
+- 在每个Node上运行日志收集daemon，例如flentd、logstash。
+- 在每个Node上运行监控daemon,例如Prometheus Node Exporter。
 
+### Job，Con Job
+- Job负责批处理任务，即仅执行一次的任务，他保证批处理任务的一个或多个Pod成功结束
+- Cron Job 管理基于时间的Job，比如：定时任务。 
 
