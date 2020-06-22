@@ -1,5 +1,22 @@
-<!-- ## kubernet系列（3）网络通讯模式 -->
+## kubernet系列（3）网络通讯模式
  
+<!-- TOC -->
+
+- [kubernet系列（3）网络通讯模式](#kubernet系列3网络通讯模式)
+  - [背景](#背景)
+  - [通讯方式](#通讯方式)
+  - [Flannel 搭建扁平化网络](#flannel-搭建扁平化网络)
+    - [简介](#简介)
+    - [目的](#目的)
+    - [Flannel与K8s的ectd关系](#flannel与k8s的ectd关系)
+  - [总结](#总结)
+    - [Pod内通信](#pod内通信)
+    - [Pod1至Pod2](#pod1至pod2)
+    - [Pod至Service通信](#pod至service通信)
+    - [Pod至外网](#pod至外网)
+    - [外网至Pod](#外网至pod)
+
+<!-- /TOC -->
 ###  背景
 - Kubernetes的网络模式假定了所有Pod都在一个可以直接连通的**扁平的网络空间**中，这在GCE（Google COmpute Engine）里面是现成的网络模型，Kubernetes假定这个网络已经存在。
 - 而在私有云力搭建Kubernetes集群，就不能假定这个网络已经存在了，我们需要自己实现这个网络假设，将不同节点上的Docker容器之间的互相访问先打通，然后在运行Kubernetes。
@@ -37,5 +54,5 @@
 #### Pod至外网
 - Pod向外网发送请求，查找路由表，转发数据包到宿主机的网卡，宿主机完成路由选择后，iptable执行Masquerade，把源IP更改为宿主机网卡的IP，然后向外网服务器发送请求。
 #### 外网至Pod
-- 通过Service提供支持。
+- 通过Service（Node port）提供支持。
 

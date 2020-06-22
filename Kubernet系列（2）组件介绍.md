@@ -1,6 +1,25 @@
-<!-- ## kubernet系列（2）Pod介绍 -->
+## kubernet系列（2）组件介绍
+<!-- TOC -->
 
-### 
+- [kubernet系列（2）组件介绍](#kubernet系列2组件介绍)
+  - [Pod](#pod)
+  - [控制器类型](#控制器类型)
+      - [ReplicationController(RC)](#replicationcontrollerrc)
+    - [ReplicaSet(RS)](#replicasetrs)
+    - [Deployment](#deployment)
+  - [StatefulSet<状态集>](#statefulset状态集)
+    - [引用场景：](#引用场景)
+  - [DaemonSet<守护进程集>](#daemonset守护进程集)
+    - [典型用法：](#典型用法)
+  - [Job，Con Job](#jobcon-job)
+  - [Pod的生命周期](#pod的生命周期)
+
+<!-- /TOC -->
+
+### Pod
+- Pod是K8s中最小的管理单元
+- Pod中可以包含多个cantainer（容器）
+- 多个相关联的Pod
 
 
 ### 控制器类型
@@ -30,4 +49,6 @@
 ### Job，Con Job
 - Job负责批处理任务，即仅执行一次的任务，他保证批处理任务的一个或多个Pod成功结束
 - Cron Job 管理基于时间的Job，比如：定时任务。 
+
+### Pod的生命周期
 
