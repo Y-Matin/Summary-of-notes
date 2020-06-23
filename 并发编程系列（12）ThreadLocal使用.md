@@ -1,15 +1,8 @@
-## 并发编程系列（12）ThreadLock使用
-<!-- TOC -->
-
-- [并发编程系列（12）ThreadLock使用](#%e5%b9%b6%e5%8f%91%e7%bc%96%e7%a8%8b%e7%b3%bb%e5%88%9712threadlock%e4%bd%bf%e7%94%a8)
-  - [1. 简介](#1-%e7%ae%80%e4%bb%8b)
-  - [2. 常见函数](#2-%e5%b8%b8%e8%a7%81%e5%87%bd%e6%95%b0)
-  - [3. 使用](#3-%e4%bd%bf%e7%94%a8)
-
-<!-- /TOC -->
+## 并发编程系列（12）ThreadLocal使用
+<!-- TOC -->autoauto- [并发编程系列（12）ThreadLocal使用](#并发编程系列12threadlocal使用)auto    - [1. 简介](#1-简介)auto    - [2. 常见函数](#2-常见函数)auto    - [3. 使用](#3-使用)autoauto<!-- /TOC -->
 ### 1. 简介
-- ThreadLock是线程变量，是一个以ThreadLock对象为键、任意对象为值的存储结构。
-- 为每个线程单独存放一份变量副本，也就是说一个线程可以根据一个ThreadLock对象查询到绑定在则线程的一个值。
+- ThreadLocal是线程变量，是一个以ThreadLocal对象为键、任意对象为值的存储结构。
+- 为每个线程单独存放一份变量副本，也就是说一个线程可以根据一个ThreadLocal对象查询到绑定在则线程的一个值。
 - 只要线程处于活动状态，并且ThreadLocal对象可访问，name每个线程都拥有对其本地线程副本的隐式引用变量。
 - 一个线程消失后，他的所有副本线程局部实例受垃圾回收（除非有其他引用在使用这些副本）
   
@@ -24,7 +17,7 @@
 ```java
 /**
  * @description: 使用ThreadLocal的示例demo
- * ThreadLock是线程变量，是一个以ThreadLock对象为键、任意对象为值的存储结构。
+ * ThreadLocal是线程变量，是一个以ThreadLocal对象为键、任意对象为值的存储结构。
  * @author: Yeds
  * @create: 2020-04-16 14:44
  **/
