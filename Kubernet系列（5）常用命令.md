@@ -4,6 +4,9 @@
 - 创建Pod
   > kubectl apply -f {PodName}.yaml
 
+  > kubectl create -f {PodName}.yaml
+  
+
 - 删除pod
   > kubectl delete pod {podName}
 
@@ -15,9 +18,12 @@
  
 - 查看 某一个具体pod 中的详细描述信息
    > kubectl describe pod XX
+- 查看 指定pod的日志
+  > kubectl logs {podName}
+  > kubectl logs -f  {podName}   
+  *类似于 tail -f 的方式查看(tail -f 实时查看日志文件 tail -f 日志文件log)*
+- 查看指定pod中具体容器的日志
+  > kubectl logs {podName} -c {containerNmme}
+- 进入Pod文件系统
+  > kubectl exec -it {podName} -c {containerName} -- sh
 
-
-
-
-- 查看指定容器中的日志
-   > kubectl log {podName} -c {containerName}

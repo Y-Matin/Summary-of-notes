@@ -39,3 +39,20 @@
 | spec.containers[].workingDir | String | 指定容器的工作目录
 | ...| ... |...
 ***
+### Pod资源实例
+pod.yaml
+```text
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+    version: v1
+spec:
+  containers:
+    - name: app
+      image: hub.yeds.com/library/myapp:v1
+````
+- 运行这个资源清单
+>  kubectl apply -f pod.yaml

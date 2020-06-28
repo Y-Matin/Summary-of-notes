@@ -13,6 +13,8 @@
     - [典型用法：](#典型用法)
   - [Job，Con Job](#jobcon-job)
   - [Pod的生命周期](#pod的生命周期)
+    - [Initc](#initc)
+    - [探针](#探针)
 
 <!-- /TOC -->
 
@@ -51,4 +53,21 @@
 - Cron Job 管理基于时间的Job，比如：定时任务。 
 
 ### Pod的生命周期
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/pod生命周期.png)
+####  Initc
+- Pod能够拥有多个容器，应用运行在容器里面，但是他也可能有一个或多个先于容器启动的Init容器
+Init容器与普通容器非常像，除了一下两点：
+  1. Init容器总是运行到成功为止
+  2. 每个Init容器都必须在下一个Init容器之前成功完成
+- 如果Pod的Init容器失败，Kubernetes会不断的重启该Pod，知道Init容器成功为止。然而 如果***Pod对应的restartPolicy为Never***，他不会重新启动
+
+#### 探针
+> 探针是有kubelet对容器执行的定期诊断，要执行诊断，kubelet调用有容器实现的Handler。有三种类型的处理程序：
+  1. ExecAction：在容器内执行指定命令。如果命令退出时，返回码为0则认为诊断成功。
+  2. ECPSocketAction：对指定端口的IP地址进行TCP检查，如果端口打开，则诊断被认为是成功的。
+  3. HTTPGetAction：对指定的端口和路径上的容器IP地址执行HTTP GET请求，如果响应的转台吗大于等于200，且小于400，则诊断被认为是成功的。
+> 每次诊断都将获得以下三种结果之一：
+  1. 成功：容器通过率诊断。
+  2. 失败：容器未通过诊断。
+  3. 未知：诊断失败，因此不会采取任何行动。
 
