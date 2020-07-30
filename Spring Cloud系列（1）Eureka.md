@@ -1,6 +1,4 @@
-# Spring Cloud 核心组件使用
-### 核心组件有：
-> 1. eureka....
+# Spring Cloud 核心组件 eureka 使用 v
 ## eureka 使用及总结
 1. Eureka 采用了 C-S 的设计架构。Eureka Server 作为服务注册功能的服务器，它是服务注册中心。
 2. Eureka包含两个组件：Eureka Server和Eureka Client
