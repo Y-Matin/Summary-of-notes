@@ -70,6 +70,7 @@ ElementType的取值包含以下几种：
 使用实例：[详情](https://blog.csdn.net/panchao888888/article/details/82882279)
 
 ### conditional
+功能：判断
 
 ### ConditionalOnWebApplication
 
@@ -102,3 +103,9 @@ ElementType的取值包含以下几种：
 ### @PostConstruct
 执行顺序：
 - @PostConstruct修饰的方法会在构造函数之后，init()方法之前运行。
+> 具体执行顺序：
+- **Constructor -> @Autowired -> @PostConstruct ->init()**
+
+
+### @Lazy
+- 懒加载：即在Spring IOC容器的创建过程中，该注解修饰的类不会到被添加到容器中，只有在被程序第一次获取时，才会被创建到ioc容器中
