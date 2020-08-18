@@ -5,6 +5,9 @@
 - 为每个线程单独存放一份变量副本，也就是说一个线程可以根据一个ThreadLocal对象查询到绑定在则线程的一个值。
 - 只要线程处于活动状态，并且ThreadLocal对象可访问，name每个线程都拥有对其本地线程副本的隐式引用变量。
 - 一个线程消失后，他的所有副本线程局部实例受垃圾回收（除非有其他引用在使用这些副本）
+- THread类中包含有 ThreadLocalMap类型的成员变量，ThreadLocalMap中存放的是Entry[]数据，每个Entry则是以ThreadLocal对象为Key，Object类型作为value。
+- ThreadLocal.set()方法内部赋值逻辑：则是先获取调用者的线程 <Thread t = Thread.currentThread()> ,再从t中获取ThreadLocalMap成员，调用ThreadLocalMap的set(),通过计算<key.threadLocalHashCode & (len-1)>, ThreadLocal的threadLocalHashCode和数组最后一个下标做与运算，得到该ThreadLocal对象的下标。从而对该下标做更新或者新增操作
+
   
 ### 2. 常见函数
 - ThreadLocal.get: 获取ThreadLocal中当前线程共享变量的值。

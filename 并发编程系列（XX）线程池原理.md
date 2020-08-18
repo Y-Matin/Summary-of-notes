@@ -173,6 +173,72 @@
 ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/ThreadPoolStatus.png)
 
 
+### 线程池 原理
+- 逻辑执行流程如下：  
+    ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/ThreadPoolLogic.png)
+- 对应的线程池处理任务的源码
+    ```java
+    public void execute(Runnable command) {
+            if (command == null)
+                throw new NullPointerException();
+            /*
+            * Proceed in 3 steps:
+            *
+            * 1. If fewer than corePoolSize threads are running, try to
+            * start a new thread with the given command as its first
+            * task.  The call to addWorker atomically checks runState and
+            * workerCount, and so prevents false alarms that would add
+            * threads when it shouldn't, by returning false.
+            *
+            * 2. If a task can be successfully queued, then we still need
+            * to double-check whether we should have added a thread
+            * (because existing ones died since last checking) or that
+            * the pool shut down since entry into this method. So we
+            * recheck state and if necessary roll back the enqueuing if
+            * stopped, or start a new thread if there are none.
+            *
+            * 3. If we cannot queue task, then we try to add a new
+            * thread.  If it fails, we know we are shut down or saturated
+            * and so reject the task.
+            */
+            int c = ctl.get();
+            if (workerCountOf(c) < corePoolSize) {
+                if (addWorker(command, true))
+                    return;
+                c = ctl.get();
+            }
+            if (isRunning(c) && workQueue.offer(command)) {
+                int recheck = ctl.get();
+                if (! isRunning(recheck) && remove(command))
+                    reject(command);
+                else if (workerCountOf(recheck) == 0)
+                    addWorker(null, false);
+            }
+            else if (!addWorker(command, false))
+                reject(command);
+        }
+    ```
+
+
+#### 如果做到线程复用呢？
+> 1. 在上面源码中，有个addWorker方法，他完整的方法签名是"boolean addWorker(Runnable firstTask, boolean core)"， 第一个参数为待执行的任务，第二个该任务是否由核心线程来执行。addWorker的功能是创建一个线程，并执行。  
+> 2. 看下addWorker()的源码,方法内部创建了一个Worker对象的实例，并从Worker实例中获取到了它的thread成员，后面调用了thread成员的start()方法。
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/worker.png)
+> 3. 看下 Worker类的内部结构，通过如下图，可以看到，Worker类继承了AQS类，并实现了Runable接口，这说明Worker本身就是一个线程类。她重新的run()方法中调用外部类的runWorker(Worker w)方法，以此把新建的Worker实例传递到外面去。
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/worker-run.png)
+> 4. 查看Worker中run()方法调用 runWorker()源码可知，该方法内部不断从队列中去任务，执行任务的run方法，从而实现线程的复用。
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/ThreadPoolExecutors-runWorker.png)
+
+#### 当等待队列没有任务时，如何让线程池中的核心线程不被销毁呢？
+
+
+### 如何设置线程池呢？
+#### 线程池参数解释：
+1. corePoolSize ：核心线程数
+    - 核心线程会一直存活，及时没有任务需要执行
+    - 当线程数小于核心线程数时，即使有线程空闲，线程池也会优先创建新线程处理
+    - 设置allowCoreThreadTimeout=true（默认false）时，核心线程会超时关闭
+2. queueCapacity： 任务队列（阻塞队列）容量
 
 ```java```
 ```java```
