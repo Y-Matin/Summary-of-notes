@@ -14,7 +14,7 @@
 
 - 前者称为主节点(master)，后者称为从节点(slave)；数据的复制是单向的，只能由主节点到从节点。
 
-！[](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/redis_master-slave.png)
+！[](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/redis_master-slave.jpg)
 ##### 配置
 ```yml
 1 slaveof <masterip> <masterport>
