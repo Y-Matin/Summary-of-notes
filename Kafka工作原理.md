@@ -1,25 +1,43 @@
-<!-- ## Kafka工作原理 -->
+## Kafka工作原理
+<!-- TOC -->
 
-### 简介
+- [Kafka工作原理](#kafka工作原理)
+    - [1. 简介](#1-简介)
+    - [2. Kafka和其他主流分布式消息系统的对比](#2-kafka和其他主流分布式消息系统的对比)
+    - [3. kafka的特性](#3-kafka的特性)
+    - [4. kafka中概念](#4-kafka中概念)
+        - [4.1. topic和消息](#41-topic和消息)
+        - [4.2. Producer](#42-producer)
+        - [4.3. Consumer](#43-consumer)
+        - [4.4. Kafka核心特性](#44-kafka核心特性)
+            - [4.4.1. 消息可靠性](#441-消息可靠性)
+        - [4.5. consumer、consumer group、partition、topic的关系](#45-consumerconsumer-grouppartitiontopic的关系)
+        - [4.6. 结尾](#46-结尾)
+            - [4.6.1. produce方面：](#461-produce方面)
+            - [4.6.2. customer方面：](#462-customer方面)
+
+<!-- /TOC -->
+
+### 1. 简介
 > Apache kafka 是一个分布式的基于push-subscribe的消息系统，它具备快速、可扩展、可持久化的特点。它现在是Apache旗下的一个开源系统，作为Hadoop生态系统的一部分，被各种商业公司广泛应用。它的最大的特性就是可以实时的处理大量数据以满足各种需求场景：比如基于hadoop的批处理系统、低延迟的实时系统、storm/Spark流式处理引擎。  
 Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持久性、分布式的发布订阅的消息队列系统。
 
-### Kafka和其他主流分布式消息系统的对比
+### 2. Kafka和其他主流分布式消息系统的对比
 ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/compare_mq.png)
-### kafka的特性
+### 3. kafka的特性
 1. **高吞吐量、低延迟**：kafka每秒可以处理几十万条消息，它的延迟最低只有几毫秒
 2. **可扩展性**：kafka集群支持热扩展
 3. **持久性、可靠性**：消息被持久化到本地磁盘，并且支持数据备份防止数据丢失
 4. **容错性**：允许集群中节点失败（若副本数量为n，则允许n-1个节点失败）
 5. **高并发**：支持数千个客户端同时读写
-### kafka中概念
+### 4. kafka中概念
 1. **broker**：书架，用于存储消息；Broker主要负责创建Topic，存储Producer所发布的消息，记录消息处理的过程，现是将消息保存到内存中，然后持久化到磁盘
 2. **topic**：消息的主题；同一个Topic的消息可以分布在一个或多个Broker上，一个Topic包含一个或者多个Partition分区，数据被存储在多个Partition中
 3. **partition**：分区；在这里被称为Topic物理上的分组，一个Topic在Broker中被分为1个或者多个Partition，也可以说为每个Topic包含一个或多个Partition，分区在创建Topic的时候可以指定。分区才是真正存储数据的单元
 3. **producer**：消息的生产者，将消息放到broker中的指定的topic下
 4. **consumer**：消息的消费者，将broker中的指定的topic下的消息取出来消费
 
-#### topic和消息
+#### 4.1. topic和消息
 - kafka将所有消息组织成多个topic的形式存储，而每个topic又可以拆分成多个partition，每个partition又由一个一个消息组成。每个消息都被标识了一个递增序列号代表其进来的先后顺序，并按顺序存储在partition中。
 ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafaka_topic_partition.png)
 - 这样，消息就以一个个id的方式，组织起来。
@@ -36,7 +54,7 @@ Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持�
 ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_partitions.png)
 
 ***
-#### Producer
+#### 4.2. Producer
 - producer生成者生产消息需要如下参数：
     1. topic： 消息的主题是什么。往哪个topic生产消息
     2. partition： 消息的分区是什么。把消息放到哪个partition中。
@@ -45,7 +63,7 @@ Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持�
 
 ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_producer.png)
 ***
-#### Consumer 
+#### 4.3. Consumer
 - 传统消息系统由两种模式：
     1. 队列
     2. 发布订阅
@@ -65,16 +83,16 @@ Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持�
     2. pull：优势在于可以控制消费速度和消费数量，保证consumer不会出现饱和；劣势在于当没有数据时，会出现空轮询，消耗cpu。
     > kafka采用pull，并采用可配置化参数保证当存在数据并且数据量达到一定量的时候，consumer端才进行pull操作，否则一直处于block状态。kakfa采用整数值consumer position来记录单个分区的消费状态，并且**单个分区单个消息只能被consumer group内的一个consumer消费**，维护简单开销小。**消费完成，broker收到确认，position指向下次消费的offset。由于消息不会删除，在完成消费，position更新之后，consumer依然可以重置offset重新消费历史消息。**
 
-#### Kafka核心特性
-##### 消息可靠性
+#### 4.4. Kafka核心特性
+##### 4.4.1. 消息可靠性
 > 在消息系统中，保证消息在生产和消费过程中的可靠性是十分重要的，在实际消息传递过程中，可能会出现如下三种情况：
 - 一个消息发送失败
 - 一个消息被发送多次
 - 最理想的情况：exactly-once，一个消息发送成功且发送了一次
 
 
-#### consumer、consumer group、partition、topic的关系 
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_topic-consumer.jpg)
+#### 4.5. consumer、consumer group、partition、topic的关系
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka-topic-consumer.jpg)
 每个group中可以有多个consumer，每个consumer属于一个consumer group；
 通常情况下，一个group中会包含多个consumer，这样不仅可以提高topic中消息的并发消费能力，而且还能提高"故障容错"性，如果group中的某个consumer失效那么其消费的partitions将会有其他consumer自动接管。
 
@@ -89,12 +107,12 @@ kafka的设计原理决定,对于一个topic，同一个group中不能有多于p
 kafka只能保证一个partition中的消息被某个consumer消费时是顺序的；事实上，从Topic角度来说,当有多个partitions时,消息仍不是全局有序的。
 
 
-#### 结尾
-##### produce方面：
+#### 4.6. 结尾
+##### 4.6.1. produce方面：
 
 如果有多个分区，发送的时候按照key值hashCode%partitionNum哈希取模分区数来决定该条信息发往哪个partition, 这里可以自定义partition的分发策略，只要实现Partitioner接口就好，可以自定义成随机分发或者fangwang发往指定分区；
 
-##### customer方面：
+##### 4.6.2. customer方面：
 
 对于topic中的partition来说，一个partition只允许一个customer来消费，同一个partition上不允许customer并发；
 
