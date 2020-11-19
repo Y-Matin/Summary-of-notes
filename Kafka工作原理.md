@@ -74,7 +74,7 @@ Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持�
 
 
 #### consumer、consumer group、partition、topic的关系 
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_topic-consumer.png)
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_topic-consumer.jpg)
 每个group中可以有多个consumer，每个consumer属于一个consumer group；
 通常情况下，一个group中会包含多个consumer，这样不仅可以提高topic中消息的并发消费能力，而且还能提高"故障容错"性，如果group中的某个consumer失效那么其消费的partitions将会有其他consumer自动接管。
 
