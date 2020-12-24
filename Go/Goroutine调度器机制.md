@@ -166,7 +166,60 @@ M0是启动程序后的编号为0的主线程，这个M对应的实例会在全�
 
 ### Goroutine调度场景过程全图文解析
 
-- 
+1. 场景一: G1创建G2
+> P拥有G1，M1获取P后开始运行G1，**G1使用 go func() 创建了G2**，为了 **局部性** G2优先加入到P1的本地队列。
+![场景1：G1创建G2](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_secne01.png)
+2. 场景二: G1执行完毕
+> G1运行完成后(函数：goexit)，M上运行的goroutine切换为G0，**G0负责调度时协程的切换（函数：schedule）。**从P的本地队列取G2，从G0切换到G2，并开始运行G2(函数：execute)。实现了线程M1的复用。
+![场景2：G1执行完毕](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_secne02.png)
+3. 场景三：G2开辟过多的G
+>假设每个P的本地队列只能存4个G。G2要创建了6个G，前3个G（G3, G4, G5）已经加入p1的本地队列，p1本地队列满了。
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_scene03.png)
+4. 场景四：本地队列满了，转移G到全局队列
+>G2在创建G7的时候，发现P1的本地队列已满，需要执行负载均衡(把P1中本地队列中前一半的G，还有新创建G转移到全局队列)
+**（实现中并不一定是新的G，如果G是G2之后就执行的，会被保存在本地队列，利用某个老的G替换新G加入全局队列）**
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_scene04.png)
+这些G被转移到全局队列时，会被打乱顺序。所以G3,G4,G7被转移到全局队列。
+5. 场景五：本地未满时，创建G8
+> G2创建G8时，P1的本地队列未满，所以G8会被加入到P1的本地队列。
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_scene04.png)
+G8加入到P1点本地队列的原因还是因为P1此时在与M1绑定，而G2此时是M1在执行。所以G2创建的新的G会优先放置到自己的M绑定的P上。
+**
+6. 场景六：尝试唤醒其他空闲的P和M组合
+> 规定：规定：在创建G时，运行的G会尝试唤醒其他空闲的P和M组合去执行。
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_scene06.png)
+假定G2唤醒了M2，M2绑定了P2，并运行G0，但P2本地队列没有G，M2此时为**自旋线程**（没有G但为运行状态的线程，不断寻找G）。
+
+7. 场景七：本地队列为空，优先取全局队列中的G
+> M2尝试从全局队列(简称“GQ”)取一批G放到P2的本地队列（函数：findrunnable()）。M2从全局队列取的G数量符合下面的公式：
+```go
+n = min(len(GQ)/GOMAXPROCS + 1, len(GQ/2))
+```
+> 至少从全局队列取1个g，但每次不要从全局队列移动太多的g到p本地队列，给其他p留点。这是从全局队列到P本地队列的负载均衡。
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_scene07.jpg)
+假定我们场景中一共有4个P（GOMAXPROCS设置为4，那么我们允许最多就能用4个P来供M使用）。所以M2只从能从全局队列取1个G（即G3）移动P2本地队列，然后完成从G0到G3的切换，运行G3。
+**
+8. 场景八：全局队列为空，本地队列为空,偷取其他P的本地队列的G
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_scene08.png)
+全局队列已经没有G，那m就要执行work stealing(偷取)：从其他有G的P哪里偷取一半G过来，放到自己的P本地队列。P2从**P1的本地队列尾部取一半的G**，本例中一半则只有1个G8，放到P2的本地队列并执行。
+
+9. 场景九：自旋线程的限制   
+>G1本地队列G5、G6已经被其他M偷走并运行完成，当前M1和M2分别在运行G2和G8，M3和M4没有goroutine可以运行，M3和M4处于**自旋状态**，它们不断寻找goroutine。
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_scene09.png)
+- 为什么要让m3和m4自旋，自旋本质是在运行，线程在运行却没有执行G，就变成了浪费CPU. 为什么不销毁现场，来节约CPU资源?
+    > 因为创建和销毁CPU也会浪费时间，我们希望当有新goroutine创建时，立刻能有M运行它，如果销毁再新建就增加了时延，降低了效率。当然也考虑了过多的自旋线程是浪费CPU  
+    所以系统中最多有GOMAXPROCS个自旋的线程(当前例子中的GOMAXPROCS=4，所以一共4个P)，多余的没事做线程会让他们休眠。
+
+10. 场景十： G发生系统调用/阻塞，P会解绑M，寻求空闲的M执行下一个G
+> ​ 假定当前除了M3和M4为自旋线程，还有M5和M6为空闲的线程(没有得到P的绑定，注意我们这里最多就只能够存在4个P，所以P的数量应该永远是M>=P, 大部分都是M在抢占需要运行的P)，G8创建了G9，G8进行了阻塞的系统调用，M2和P2立即解绑.  
+P2会执行以下判断：如果P2本地队列有G、全局队列有G或有空闲的M，P2都会立马唤醒1个M和它绑定，否则P2则会加入到空闲P列表，等待M来获取可用的p。本场景中，P2本地队列有G9，可以和其他空闲的线程M5绑定。
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_scene10.png)
+**
+
+11. 场景十一： G发生系统调用/非阻塞性,
+> ​ M2和P2会解绑，但M2会记住P2，然后G8和M2进入系统调用状态。当G8和M2退出系统调用时，会尝试获取P2，如果无法获取，则获取空闲的P，如果依然没有，G8会被记为可运行状态，并加入到全局队列,M2因为没有P的绑定而变成休眠状态(长时间休眠等待GC回收销毁)。
+![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go_scene11.png)
+
 
 
 
