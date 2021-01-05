@@ -1,13 +1,10 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": ".."
-		}
-	],
-	"settings": {
-		"editor.suggestFontSize": 10
-	}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "editor.suggestFontSize": 10
+  }
 }

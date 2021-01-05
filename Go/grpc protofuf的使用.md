@@ -51,3 +51,12 @@ enum ProdAreas{
 
 #### 日期格式
 
+
+###  编译命令
+
+- 编译proto文件生成 rpc接口
+> protoc --go_out=pluins=grpc:../service Prod.proto
+
+- 既支持rpc也支持http 
+> protoc --grpc-gateway_out=logtosderr=true:../services Order.proto
+
