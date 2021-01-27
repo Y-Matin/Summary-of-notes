@@ -1,5 +1,11 @@
 <!-- ## Grpc protobuf 的使用 -->
 
+- 核心思路：
+> 编译自己自定义的proto文件，得到对应编程语言的版本，将这版本分别放到server端和client端  
+> server端利用该编译版本，得到server，将实现了rpc方法的结构体注册到该server中，负责处理client端的grpc请求  
+> client端利用该编译版本，得到client，使用client 构造参数，调用rpc方法。
+- grpc-gateway，主要是为了提供http形式的rpc调用。
+
 ###  简单示例
 ```proto
 // 指定protobuf的版本，proto3是最新的语法版本
@@ -62,3 +68,18 @@ enum ProdAreas{
 - 既支持rpc也支持http 
 > protoc --grpc-gateway_out=logtosderr=true:../services Order.proto
 
+
+
+### 流模式
+- 场景：
+  > 在批量查询时：  
+  传统方式：一边要等待client端组装请求数据，然后在发送给server端，在等server端查询数据并组装返回数据，在一并返回。   
+  缺点：  
+  当 并发高，请求数据量大时，耗时增加，响应变慢
+
+- 流的分类
+  1. 服务端流 《服务端耗时占比较大》
+    - 客户端一次性把要查询的客户列表发送给server端，server端分批次返回到流中，client端从流中读取，可以一边读取数据，一边处理数据，知道流中没有数据
+  2. 客户端流 《客户端耗时占比较大》
+    - 
+  3. 双向流
