@@ -234,7 +234,27 @@ GET /test_user/user/_search
 
 
 
-
+#### es 索引 改名，迁移
+-	es Reindex 数据迁移
+- ES在创建好索引后，mapping的properties属性类型是不能更改的，只能添加。如果说需要修改字段就需要重新建立索引然后把旧数据导到新索引。
+-	5.X版本后新增_reindex API 。Reindex可以直接在Elasticsearch集群里面对数据进行重建。并且支持跨集群间的数据迁移
+	  -	步骤：
+	  -	1.原索引 topic
+	  -	2.创建新的索引 topic-new
+	  -	3.迁移数据:reindex
+    ``` 
+    POST http://172.16.1.236:9201/_reindex
+      {
+        "source": {
+          "index": "topic"
+        },
+        "dest": {
+          "index": "topic-new"
+        }
+      }
+    ```
+	- 4.删除原索引
+	- 5.把原索引的名字作为新索引的别名（不用改业务代码）
 
 
 
