@@ -13,7 +13,7 @@
 - 已经close的chan： 读取零值
 
  #### 关闭：
-- 未初始化chan：触发panic panic: close of nil channel
+- 未初始化chan：触发panic （panic: close of nil channel）
 - 已初始化的，未close的： 关闭成功，读完数据后，返回零值
 - 已经close的chan：触发panic （panic: close of closed channel）
 
