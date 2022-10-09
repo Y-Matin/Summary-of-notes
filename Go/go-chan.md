@@ -21,3 +21,9 @@
 - 读取 非常 稳定，不会panic，只会阻塞
 - close 非常严格，非正常情况close，会触发panic
 - 写入比较特殊,写入未初始化的，会阻塞；写入已经close的，会panic
+
+
+- 注意点是 判断chan是否close
+- i,ok:= <- chan，
+- ok 只是表示 从chan中取的数据是否是有效的，《非零值》
+只有当ok是true时，表示 chan被close，为false，chan可能没有被close，也可能是close了，但chan里面还有数据
