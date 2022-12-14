@@ -8,12 +8,7 @@
 #### 示例：
 > 前置依赖： golang环境+docker环境+要部署的项目
 - 以linux 系统为例：
-    1. 在main目录下准备编译脚本：
-    ```sh
-    # linux
-    export  CGO_ENABLED=0
-    export  GOOS=linux
-    export  GOARCH=amd64
+ 
     go build
     ```
     2. 进入main目录执行后，得到 linux下的二进制文件

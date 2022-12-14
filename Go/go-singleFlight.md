@@ -9,7 +9,7 @@
 ```golang
 // call is an in-flight or completed singleflight.Do call
 type call struct {
-	wg sync.WaitGroup  // 互斥锁 比 sync.Mutex 好处是：在请求出完后，等待的其他请求可以同时继续业务， mutex只能单个加锁，释放锁，效率低;用sync.RWMutex，似乎能达到WG的效果
+	wg sync.WaitGroup  // 互斥锁 比 sync.Mutex 好处是：在请求出完后，等待的其他请求可以同时继续业务， mutex只能单个加锁，释放锁，效率低;用sync.RWMutex，似乎能达到WG的效果，但可能后一个请求先拿到读锁，导致原始请求无法拿到写锁，结果出错。
 
 	val interface{}
 	err error
@@ -36,8 +36,5 @@ type Group struct {
 > DoChan is like Do but returns a channel that will receive the results when they are ready.   
  和Do()类似， 但是会直接返回一个chan， 当原始调用者完成调用后，会从chan中读取值。 可以添加超时逻辑
 
-3. Group.doCall()
-> doCall handles the single call for a key.   
-处理调用对应key的 逻辑函数
-4. Group.Forget() 
+3. Group.Forget() 
 > 删除 对应key的记录
