@@ -7,6 +7,10 @@
   - [3. 重要概念](#3-重要概念)
     - [3.1. Kubernetes主要由以下几个核心组件组成：](#31-kubernetes主要由以下几个核心组件组成)
     - [3.2. 除了核心组件，还有一些推荐的Add-ons：](#32-除了核心组件还有一些推荐的add-ons)
+    - [service的类型](#service的类型)
+  - [权限配置](#权限配置)
+    - [RBAC](#rbac)
+    - [ingress](#ingress)
 
 <!-- /TOC -->
 ### 1. 简介
@@ -46,3 +50,53 @@
   ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/k8s-master.png)
   ****
   ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/k8s-node.png)
+
+
+
+
+
+
+
+
+
+#### service的类型
+- NodePort ：会直接在物理机上开放一个端口，用于访问本服务
+- ClusterIP ：K8S默认的服务类型，只能在K8S中进行服务通信，自动分配一个仅Cluster内部可以访问的虚拟IP
+- LoadBalancer ：在NodePort的基础上，借助Cloud Provider创建一个外部负载均衡器，并将请求转发到NodePort
+- ExternalName ：把集群外部的服务引入到集群内部来，在集群内部直接使用。没有任何类型代理被创建
+
+
+
+
+
+
+### 权限配置
+#### RBAC
+- 1. 什么是RBAC
+> RBAC全称Role-Based Access Control，是Kubernetes集群基于角色的访问控制，实现授权决策，允许通过Kubernetes API动态配置策略。
+- 2. 什么是Role
+> Role是一组权限的集合，例如Role可以包含列出Pod权限及列出Deployment权限，Role用于给某个NameSpace中的资源进行鉴权
+- 3. 什么是ClusterRole
+> ClusterRole是一组权限的集合，但与Role不同的是，ClusterRole可以在包括所有NameSpace和集群级别的资源或非资源类型进行鉴权
+- 4. 什么是Subject
+> Subject：有三种Subjects，分别是Service Account、User Account、Groups，参照官方文档主要区别是User Account针对人，Service Accounts针对运行在Pods中运行的进程。
+- 5. 什么是RoleBinding与ClusterRoleBinding
+> RoleBinding与ClusterRoleBindin：将Subject绑定到Role或ClusterRole。其区别在于：RoleBinding将使规则在命名空间内生效，而ClusterRoleBinding将使规则在所有命名空间中生效。
+
+**总结：role/clusterRole 属于一类角色，功能描述为可以对哪些资源拥有哪些操作；Susject可以看做是一个用户组，组内成员拥有相同权限；RoleBinding/clusterRoleBinding 可以看做是一种绑定关系，描述了用户组和role的关联关系，带有cluster前缀的表示该作用生效范围包含了所有namespace**
+
+#### ingress
+- Service只支持4层负载均衡，而Ingress有7层功能
+- Nginx可以通过虚拟主机域名区分不同的服务，而每个服务通过 upstream进行定义不同的负载均衡池，再加上 location进行负载均衡的反向代理，在日常使用中只需要修改 nginx.conf即可实现，但是在 K8S中又该如何实现这种方式调度呢？
+- K8S引入了 ingress自动进行服务的调度， ingress包含两大组件： ingress controller和 ingress。
+  - ingress：修改 Nginx配置操作被抽象成了 ingress对象。
+  - ingress controller： ingress controller通过与 kubernetes API交互，动态的去感知进集群中 Ingress规则变化，然后读取它，然后读取它，按照它自己的模板生成一段 nginx配置，再写到 nginx Pod中，最后 reload以下，工作流程如下图：  
+   ![](./images/k8s/ingress-controller.png)
+
+- Ingress 可以解决什么问题？
+动态配置服务
+
+如果按照传统方式, 当新增加一个服务时, 我们可能需要在流量入口加一个反向代理指向我们新的服务. 而如果用了Ingress, 只需要配置好这个服务, 当服务启动时, 会自动注册到Ingress的中, 不需要而外的操作.
+减少不必要的端口暴露
+
+配置过k8s的都清楚, 第一步是要关闭防火墙的, 主要原因是k8s的很多服务会以NodePort方式映射出去, 这样就相当于给宿主机打了很多孔, 既不安全也不优雅. 而Ingress可以避免这个问题, 除了Ingress自身服务可能需要映射出去, 其他服务都不要用NodePort方式

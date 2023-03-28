@@ -83,6 +83,7 @@ https://docs.docker.com/engine/reference/commandline/docker/
 - 如果src是一个本地压缩文件，则在ADD的同时完整解压操作
 - 如果dest不存在，则ADD指令会创建目标目录
 - 应尽量减少通过ADD URL添加remote文件，建议使用curl或者wget&&untar
+- **ADD命令官方推荐只有在解压缩文件并把它们添加到镜像中时才需要。**
 
 ##### COPY XX
 - COPY:从源地址（文件，目录或者URL)复制文件到目标路径
@@ -95,15 +96,33 @@ https://docs.docker.com/engine/reference/commandline/docker/
 - COPY --from=build /bin/project /bin/project
 - COPY语义上更直白，复制本地文件时，优先使用COPY
 
+
+```
+add 比copy 多一些功能： 自动把压缩包解压；源文件可以来源于url中，但官方不推荐，因为这样的镜像体积比较大
+```
+
+
+
+#### CMD
+- 指定启动容器时执行的命令，每个 Dockerfile只能有一条 CMD 命令。如果指定了多条命令，只有最后一条会被执行。如果用户启动容器时候指定了运行的命令，则会覆盖掉 CMD 指定的命令。
+
+
 ####  ENTRYPOINT
 - ENTRYPOINT:定义可以执行的容器镜像入口命令
 - ENTRYPOINT["executable","param1","param.2"]/docker run参数追加模式
 - ENTRYPOINT command param1 param2/∥docker run参数替换模式
 - docker run-entrypoint可替换Dockerfile中定义的ENTRYPOINT
-- ENTRYPOINT的最佳实践是用ENTRYPOINT定义镜像主命令，并通过CMD定义主要参数，如下
-所示
+- ENTRYPOINT的最佳实践是用ENTRYPOINT定义镜像主命令，并通过CMD定义主要参数，
+- 配置容器启动后执行的命令，并且不可被 docker run 提供的参数覆盖。每个 Dockerfile 中只能有一个 ENTRYPOINT，当指定多个时，只有最后一个起效。
+
+如下所示
 ENTRYPOINT ["s3cmd"]
 CMD [--help"]
+
+#### cmd 和endpoint的区别
+- 1、CMD指令指定的容器启动时命令可以被docker run指定的命令覆盖ENTRYPOINT指令指定的命令不能被覆盖，而是将docker run指定的参数当做ENTRYPOINT指定命令的参数。
+- 2、CMD与ENTRYPOINT同时存在时，CMD指令可以为ENTRYPOINT指令设置默认参数，而且CMD可以被docker run指定的参数覆盖；
+
 ##### Dockerfile最佳实践
 
 - 不要安装无效软件包
@@ -119,3 +138,14 @@ CMD [--help"]
 。
 编写dockerfile的时候，应该把变更频率低的编译指令优先构建以便放在镜像底层以有效利用build cache
 复制文件时，每个文件应独立复制，这确保某个文件变更时，只影响改文件对应的缓存
+
+
+
+
+#### 打包
+```
+docker build -t martinyds/ingress-manager:1.0.0 .
+docker push martinyds/ingress-manager:1.0.0
+
+
+``

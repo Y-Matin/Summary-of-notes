@@ -26,7 +26,8 @@
 - 注意点是 判断chan是否close
 - i,ok:= <- chan，
 - ok 只是表示 从chan中取的数据是否是有效的，《非零值》
-只有当ok是true时，表示 chan被close，为false，chan可能没有被close，也可能是close了，但chan里面还有数据
+只有当ok是false时，表示 chan被close了，
+ok是true，chan可能没有被close，也可能是close了，但chan里面还有数据
 
 
 - 写入 未初始化的chan 会阻塞， 当chan 被初始化后，可以被之前的逻辑正确写入

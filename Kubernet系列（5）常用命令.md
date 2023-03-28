@@ -27,3 +27,8 @@
 - 进入Pod文件系统
   > kubectl exec -it {podName} -c {containerName} -- sh
 
+
+```
+martin@yds-server:~$ kubectl expose deployment hello-minikube --type=NodePort --port=8080
+service/hello-minikube exposed
+```
