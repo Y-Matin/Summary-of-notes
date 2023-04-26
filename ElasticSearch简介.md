@@ -186,9 +186,9 @@ GET /test_user/user/_search
 - 关于分词
 1. term ：直接查询精确的
 2. match ：模糊查询，会使用分词器解析 ！（先分析文档，才匹配）
-  - 字段的两个类型：
-  1. text: 会被分词器分词，与查询条件进行匹配
-  2. keyword ： 不会被分词， 直接与查询条件匹配
+  - 字段的两个类型：  
+      1. text: 会被分词器分词，与查询条件进行匹配
+      2. keyword ： 不会被分词， 直接与查询条件匹配
 
 - 高亮查询 
 hightlight : 将 name 高亮 
@@ -219,6 +219,14 @@ GET /test_user/user/_search
 }
 ```
 
+#### filter与query对比大解密
+- filter，仅仅只是按照搜索条件过滤出需要的数据而已，不计算任何相关度分数，对相关度没有任何影响。
+- query，会计算每个document相对于搜索条件的相关度，并按照相关度进行排序。
+- 一般来说，如果你是在进行搜索，需要将最匹配搜索条件的数据先返回，那么用query；如果你只是要根据一些条件筛选出一部分数据，不关注排序，那么使用filter。
+
+#### filter和query性能对比
+- filter，不需要计算相关度分数，不需要按照相关度分数进行排序，同时还有内置的机制，自动cache最常使用filter的数据。
+- query，相反，要计算相关度分数，按照分数进行排序，而且无法cache结果。
 
 
 
@@ -226,8 +234,46 @@ GET /test_user/user/_search
 
 
 
+#### es 索引 改名，迁移
+-	es Reindex 数据迁移
+- ES在创建好索引后，mapping的properties属性类型是不能更改的，只能添加。如果说需要修改字段就需要重新建立索引然后把旧数据导到新索引。
+-	5.X版本后新增_reindex API 。Reindex可以直接在Elasticsearch集群里面对数据进行重建。并且支持跨集群间的数据迁移
+	  -	步骤：
+	  -	1.原索引 topic
+	  -	2.创建新的索引 topic-new
+	  -	3.迁移数据:reindex
+    ``` 
+    POST http://172.16.1.236:9201/_reindex
+      {
+        "source": {
+          "index": "topic"
+        },
+        "dest": {
+          "index": "topic-new"
+        }
+      }
+    ```
+	- 4.删除原索引
+	- 5.把原索引的名字作为新索引的别名（不用改业务代码）
 
 
+- 一次查询的过程 
+答： query the fetch
+1、搜索被执行成一个两阶段过程，我们称之为 Query Then Fetch；
+2、在初始查询阶段时，查询会广播到索引中每一个分片拷贝（主分片或者副本分片）。 每个分片在本地执行搜索并构建一个匹配文档的大小为 from + size 的优先队列。
+备注：在搜索的时候是会查询 Filesystem Cache 的，但是有部分数据还在 MemoryBuffer，所以搜索是近实时的。
+3、每个分片返回各自优先队列中 所有文档的 ID 和排序值 给协调节点，它合并这些值到自己的优先队列中来产生一个全局排序后的结果列表。
+4、接下来就是 取回阶段，协调节点辨别出哪些文档需要被取回并向相关的分片提交多个 GET 请求。每个分片加载并 丰富 文档，如果有需要的话，接着返回文档给协调节点。一旦所有的文档都被取回了，协调节点返回结果给客户端。
+5、补充：Query Then Fetch 的搜索类型在文档相关性打分的时候参考的是本分片的数据，这样在文档数量较少的时候可能不够准确，DFS Query Then Fetch 增加了一个预查询的处理，询问 Term 和 Document frequency，这个评分更准确，但是性能会变差。
 
+2. es的准实时，内部原理
+一次update和delete 会写入 memory buffer 和translog  事务日志中
+ 三级存储：
+1.memory buffer   （最新的数据，不在搜索范围中）
+2.filesystem Cache （数据都在可搜索范围中， 由1->2同步过程叫refresh，默认1s，或则buffer满了）
+3.disk   （2->3过程叫flush，）
 
-
+- translog 用于 分片恢复数据
+所有索引的写入和删除操作在 Luence 内部处理之后确认之前被写入 Translog。这样如果发生崩溃，则在分片恢复时已确认但未提交写入磁盘的数据将从 Translog 中进行恢复。
+Elasticsearch 的 flush 操作会执行 commit 提交 和 新的 Translog 生成，刷新是后台自动执行的，以确保 Translog 不会太大而使得恢复需要相当长的时间进行重放。
+flush 操作会进行 commit，并清除 translog。
