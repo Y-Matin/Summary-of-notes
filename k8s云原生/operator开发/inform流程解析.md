@@ -41,13 +41,25 @@ Informer 的主要功能：
 
     根据对应的事件类型，触发事先注册好的 ResourceEventHandle
 
+```
+Informer 在初始化时，Reflector 会先 List API 获得所有的 Pod
+Reflect 拿到全部 Pod 后，会将全部 Pod 放到 Store 中
+如果有人调用 Lister 的 List/Get 方法获取 Pod， 那么 Lister 会直接从 Store 中拿数据
+Informer 初始化完成之后，Reflector 开始 Watch Pod，监听 Pod 相关 的所有事件;如果此时 pod_1 被删除，那么 Reflector 会监听到这个事件
+Reflector 将 pod_1 被删除 的这个事件发送到 DeltaFIFO
+DeltaFIFO 首先会将这个事件存储在自己的数据结构中(实际上是一个 queue)，然后会直接操作 Store 中的数据，删除 Store 中的 pod_1
+DeltaFIFO 再 Pop 这个事件到 Controller 中
+Controller 收到这个事件，会触发 Processor 的回调函数
+LocalStore 会周期性地把所有的 Pod 信息重新放到 DeltaFIFO 中
+```
+
 #### 1.Reflector
 Reflector 和 APIServer 建立长连接，并使用 ListAndWatch 方法获取并监听某一个资源的变化。List 方法将会获取某个资源的所有实例(如ReplicaSet、Deployment等)，Watch 方法则监听资源对象的创建、更新以及删除事件，获取到的事件称之为一个增量(Delta)，该增量会被放进一个称之为 Delta FIFO Queue，即增量先进先出队列中。
 Reflector 包负责与 apiserver 建立连接，Reflector 使用 ListAndWatch 的方法，会先从 apiserver 中 list 该资源的所有实例，list 会拿到该对象最新的 resourceVersion，然后使用 watch 方法监听该 resourceVersion 之后的所有变化，若中途出现异常，reflector 则会从断开的 resourceVersion 处重现尝试监听所有变化，一旦该对象的实例有创建、删除、更新动作，Reflector 都会收到"事件通知"，这时，该事件及它对应的 API 对象这个组合，被称为增量（Delta），它会被放进 DeltaFIFO 中。
 
 
 #### deltaFIFO
-1. Informer 会不断地从这个 DeltaFIFO 中读取增量，每拿出一个对象，Informer 就会判断这个增量的时间类型，然后创建或更新本地的缓存，也就是 store。
+1. Informer 会不断地从这个 DeltaFIFO 中读取增量，每拿出一个对象，Informer 就会判断这个增量的事件类型，然后创建或更新本地的缓存，也就是 store。
 2. 如果事件类型是 Added（添加对象），那么 Informer 会通过 Indexer 的库把这个增量里的 API 对象保存到本地的缓存中，并为它创建索引，若为删除操作，则在本地缓存中删除该对象。
 3. DeltaFIFO 再 pop 这个事件到 controller 中，controller 会调用事先注册的 ResourceEventHandler 回调函数进行处理。
 
@@ -69,8 +81,10 @@ Controller 从 workqueue 里面取出 Object，启动一个 worker 来执行自�
 - list: /api/v1/namespaces/{namespace}/pods
 
 - watch: /api/v1/namespaces/default/pods?watch=true
+- List的实现容易理解，那么Watch是如何实现的呢？Watch是如何通过HTTP 长链接接收apiserver发来的资源变更事件呢？
+> HTTP 分块传输编码允许服务器为动态生成的内容维持 HTTP 持久链接。通常，持久链接需要服务器在开始发送消息体前发送Content-Length消息头字段，但是对于动态生成的内容来说，在内容创建完之前是不可知的。使用分块传输编码，数据分解成一系列数据块，并以一个或多个块发送，这样服务器可以发送数据而不需要预先知道发送内容的总大小。
 
-  
+秘诀就是Chunked transfer encoding(分块传输编码)，它首次出现在HTTP/1.1。正如维基百科所说：
 
 - ResourceVersion 和Bookmarks
 - ResourceVersion
@@ -79,3 +93,8 @@ Controller 从 workqueue 里面取出 Object，启动一个 worker 来执行自�
 - Bookmarks
   - 减少API Server负载
   - 更新客户端保存的最近一次ResourceVersion  
+
+
+
+
+

@@ -2,19 +2,19 @@
 <!-- TOC -->
 
 - [Kafka工作原理](#kafka工作原理)
-    - [1. 简介](#1-简介)
-    - [2. Kafka和其他主流分布式消息系统的对比](#2-kafka和其他主流分布式消息系统的对比)
-    - [3. kafka的特性](#3-kafka的特性)
-    - [4. kafka中概念](#4-kafka中概念)
-        - [4.1. topic和消息](#41-topic和消息)
-        - [4.2. Producer](#42-producer)
-        - [4.3. Consumer](#43-consumer)
-        - [4.4. Kafka核心特性](#44-kafka核心特性)
-            - [4.4.1. 消息可靠性](#441-消息可靠性)
-        - [4.5. consumer、consumer group、partition、topic的关系](#45-consumerconsumer-grouppartitiontopic的关系)
-        - [4.6. 结尾](#46-结尾)
-            - [4.6.1. produce方面：](#461-produce方面)
-            - [4.6.2. customer方面：](#462-customer方面)
+  - [1. 简介](#1-简介)
+  - [2. Kafka和其他主流分布式消息系统的对比](#2-kafka和其他主流分布式消息系统的对比)
+  - [3. kafka的特性](#3-kafka的特性)
+  - [4. kafka中概念](#4-kafka中概念)
+    - [4.1. topic和消息](#41-topic和消息)
+    - [4.2. Producer](#42-producer)
+    - [4.3. Consumer](#43-consumer)
+    - [4.4. Kafka核心特性](#44-kafka核心特性)
+      - [4.4.1. 消息可靠性](#441-消息可靠性)
+    - [4.5. consumer、consumer group、partition、topic的关系](#45-consumerconsumer-grouppartitiontopic的关系)
+    - [4.6. 结尾](#46-结尾)
+      - [4.6.1. produce方面：](#461-produce方面)
+      - [4.6.2. customer方面：](#462-customer方面)
 
 <!-- /TOC -->
 
@@ -62,6 +62,9 @@ Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持�
     4. message：消息的内容
 
 ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_producer.png)
+
+![](images/kafka_producer.png)
+
 ***
 #### 4.3. Consumer
 - 传统消息系统由两种模式：

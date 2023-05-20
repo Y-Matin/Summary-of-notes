@@ -148,4 +148,22 @@ docker build -t martinyds/ingress-manager:1.0.0 .
 docker push martinyds/ingress-manager:1.0.0
 
 
-``
+```
+
+### 多过程打包示例：
+```dockerfile
+FROM golang:1.19 as builder
+WORKDIR /app
+COPY .  . 
+ENV GOPROXY="https://goproxy.io"
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o gatewayService /app/cmd/
+
+
+FROM alpine AS runner
+WORKDIR /project
+COPY --from=builder /app/gatewayService .
+COPY --from=builder /app/config/ ./config/
+EXPOSE  2000
+CMD /project/gatewayService
+
+```

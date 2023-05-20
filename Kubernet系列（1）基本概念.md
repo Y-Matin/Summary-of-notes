@@ -11,6 +11,8 @@
   - [权限配置](#权限配置)
     - [RBAC](#rbac)
     - [ingress](#ingress)
+  - [开放接口](#开放接口)
+    - [CNI  :Flannel,Calico](#cni--flannelcalico)
 
 <!-- /TOC -->
 ### 1. 简介
@@ -60,8 +62,8 @@
 
 
 #### service的类型
-- NodePort ：会直接在物理机上开放一个端口，用于访问本服务
-- ClusterIP ：K8S默认的服务类型，只能在K8S中进行服务通信，自动分配一个仅Cluster内部可以访问的虚拟IP
+- NodePort ：会直接在物理机上开放一个端口，用于访问本服务；一共有3中路径访问：（nodeIp；serviceIp，podIp）
+- ClusterIP ：K8S默认的服务类型，只能在K8S中进行服务通信，自动分配一个仅Cluster内部可以访问的虚拟IP <kube-proxy是iptables 则ping不通，是ipvs 才能ping通 clusterIp>
 - LoadBalancer ：在NodePort的基础上，借助Cloud Provider创建一个外部负载均衡器，并将请求转发到NodePort
 - ExternalName ：把集群外部的服务引入到集群内部来，在集群内部直接使用。没有任何类型代理被创建
 
@@ -75,11 +77,18 @@
 - 1. 什么是RBAC
 > RBAC全称Role-Based Access Control，是Kubernetes集群基于角色的访问控制，实现授权决策，允许通过Kubernetes API动态配置策略。
 - 2. 什么是Role
-> Role是一组权限的集合，例如Role可以包含列出Pod权限及列出Deployment权限，Role用于给某个NameSpace中的资源进行鉴权
+> Role是一组权限的集合，例如Role可以包含列出Pod权限及列出Deployment权限，Role用于给某个NameSpace中的资源进行鉴权  
+  -  Role：授权特定命名空间的访问权限
+  - ClusterRole：授权所有命名空间的访问权限
 - 3. 什么是ClusterRole
-> ClusterRole是一组权限的集合，但与Role不同的是，ClusterRole可以在包括所有NameSpace和集群级别的资源或非资源类型进行鉴权
+> ClusterRole是一组权限的集合，但与Role不同的是，ClusterRole可以在包括所有NameSpace和集群级别的资源或非资源类型进行鉴权  
+  - RoleBinding：将角色绑定到主体（即subject）
+  - ClusterRoleBinding：将集群角色绑定到主体
 - 4. 什么是Subject
-> Subject：有三种Subjects，分别是Service Account、User Account、Groups，参照官方文档主要区别是User Account针对人，Service Accounts针对运行在Pods中运行的进程。
+> Subject：有三种Subjects，分别是Service Account、User 、Groups
+   - User：用户
+   - Group：用户组
+   - ServiceAccount：服务账号
 - 5. 什么是RoleBinding与ClusterRoleBinding
 > RoleBinding与ClusterRoleBindin：将Subject绑定到Role或ClusterRole。其区别在于：RoleBinding将使规则在命名空间内生效，而ClusterRoleBinding将使规则在所有命名空间中生效。
 
@@ -100,3 +109,54 @@
 减少不必要的端口暴露
 
 配置过k8s的都清楚, 第一步是要关闭防火墙的, 主要原因是k8s的很多服务会以NodePort方式映射出去, 这样就相当于给宿主机打了很多孔, 既不安全也不优雅. 而Ingress可以避免这个问题, 除了Ingress自身服务可能需要映射出去, 其他服务都不要用NodePort方式
+
+### 开放接口
+
+- Kubernetes作为云原生应用的的基础调度平台，相当于云原生的操作系统，为了便于系统的扩展，Kubernetes中开放的以下接口，可以分别对接不同的后端，来实现自己的业务逻辑：
+
+- CRI（Container Runtime Interface）：容器运行时接口，提供计算资源   docker  containerd
+- CNI（Container Network Interface）：容器网络接口，提供网络资源  
+- CSI（Container Storage Interface）：容器存储接口，提供存储资源
+
+
+
+
+
+#### CNI  :Flannel,Calico
+
+CNI的接口中包括以下几个方法：
+```
+type CNI interface {
+    AddNetworkList(net *NetworkConfigList, rt *RuntimeConf) (types.Result, error)
+    DelNetworkList(net *NetworkConfigList, rt *RuntimeConf) error
+
+    AddNetwork(net *NetworkConfig, rt *RuntimeConf) (types.Result, error)
+    DelNetwork(net *NetworkConfig, rt *RuntimeConf) error
+} 
+
+```
+该接口只有四个方法，添加网络、删除网络、添加网络列表、删除网络列表。
+
+
+ 最后简单总结一下 CNI 相关。
+
+    1. k8s 的 kubelet 在启动一个容器之前，会先做一些预先检查以及 csi 的操作
+    2. 然后 kubelet 调用 CRI 的接口，通过 grpc 的方式和 CRI runtime 通信，告知 CRI 要创建 pod 了
+    3. 随后 CRI 的 Server 端收到通知后调用 OCI 的接口去真正的执行拉起 Pod 的操作
+    4. 不过在真的拉起 pod 之前，会先给 pod 创建一个 pause 容器，这个 pause 容器是一个特别小又特别稳定的进程，主要用来挂载网络命名空间和存储资源
+    5. 然后 CRI 调用 CNI 提供的接口，先在 /etc/cni/net.d 目录中获取网络插件配置(这个配置由每个插件自己通过 daemonset 的方式拷贝到主机上), 然后把插件的配置作为标准输入, 再把容器的运行时信息作为环境变量, 最后执行插件
+    6. CNI 插件执行完毕后, 把执行结果(结果要包含一些关键信息比如 Pod IP 等)直接干到标准输出上
+    7. CRI 从标准输出上读取插件执行结果再做后续操作, 后续操作就是拉起真正的容器等
+
+
+
+
+
+使用 Operator 可以自动化的事情包括：
+
+    按需部署应用
+    获取/还原应用状态的备份
+    处理应用代码的升级以及相关改动。例如数据库 Schema 或额外的配置设置
+    发布一个 Service，要求不支持 Kubernetes API 的应用也能发现它
+    模拟整个或部分集群中的故障以测试其稳定性
+    在没有内部成员选举程序的情况下，为分布式应用选择首领角色

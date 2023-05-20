@@ -28,6 +28,42 @@ Forwarding from 0.0.0.0:10443 -> 8443
 - 使用命令 获取某个pod 的 配置详情：
 > mkubectl get  pod dashboard-metrics-scraper-6b6f796c8d-jxv6z  -n kube-system  -o yaml
 
+
+
+### dry-run 
+- 使用dry-run，检查 或者得到 yaml的基本值
+```
+kubectl create serviceaccount ingress-manager-sa --dry-run=client -o yaml > manifests/ingress-manager-sa.yml
+
+```
+
+### api-resources
+- 查看 资源类型和版本的关系
+```
+martin@yds-server:~$ kubectl api-resources
+NAME                              SHORTNAMES   APIVERSION                             NAMESPACED   KIND
+bindings                                       v1                                     true         Binding
+componentstatuses                 cs           v1                                     false        ComponentStatus
+configmaps                        cm           v1                                     true         ConfigMap
+endpoints                         ep           v1                                     true         Endpoints
+events                            ev           v1                                     true         Event
+limitranges                       limits       v1                                     true         LimitRange
+namespaces                        ns           v1                                     false        Namespace
+nodes                             no           v1                                     false        Node
+
+```
+### explain
+- 查看某个资源下的 所有的属性字段
+```
+ kubectl explain pod
+ kubectl explain pod.spec
+
+```
+
+
+
+
+-----
 ```yaml
 apiVersion: v1
 kind: Pod
