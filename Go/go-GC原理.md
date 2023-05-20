@@ -65,7 +65,7 @@ v 1.8 ——2017/2—— hybrid write barrier ————sub ms
 3. 遍历灰色集合中的对象，把灰色对象引用的白色集合的对象放入到灰色集合中，同时把遍历过的灰色集合中的对象放到黑色的集合中
 4. 循环步骤3，直到灰色集合中没有对象
 5. 步骤4结束后，白色集合中的对象就是不可达对象，也就是垃圾，进行回收
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go-gc.webp)
+![](images/go/go-gc.webp)
 
 
 ### 6. 写屏障
@@ -86,7 +86,7 @@ v 1.8 ——2017/2—— hybrid write barrier ————sub ms
 
 #### 6.3. 写屏障的分类
 **注意：由于栈上的操作需要保证性能，所以所有的写屏障均只针对堆上的对象。**
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/go/go-barrier.png)
+![](images/go/go-barrier.png)
 
 
 ### GC的优化

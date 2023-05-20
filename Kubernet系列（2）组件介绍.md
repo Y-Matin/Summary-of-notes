@@ -53,7 +53,7 @@
 - Cron Job 管理基于时间的Job，比如：定时任务。 
 
 ### Pod的生命周期
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/pod生命周期.png)
+![](images/pod生命周期.png)
 ####  Initc
 - Pod能够拥有多个容器，应用运行在容器里面，但是他也可能有一个或多个先于容器启动的Init容器
 Init容器与普通容器非常像，除了一下两点：

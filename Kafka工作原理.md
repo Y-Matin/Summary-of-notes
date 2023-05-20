@@ -23,7 +23,7 @@
 Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持久性、分布式的发布订阅的消息队列系统。
 
 ### 2. Kafka和其他主流分布式消息系统的对比
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/compare_mq.png)
+![](images/compare_mq.png)
 ### 3. kafka的特性
 1. **高吞吐量、低延迟**：kafka每秒可以处理几十万条消息，它的延迟最低只有几毫秒
 2. **可扩展性**：kafka集群支持热扩展
@@ -39,7 +39,7 @@ Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持�
 
 #### 4.1. topic和消息
 - kafka将所有消息组织成多个topic的形式存储，而每个topic又可以拆分成多个partition，每个partition又由一个一个消息组成。每个消息都被标识了一个递增序列号代表其进来的先后顺序，并按顺序存储在partition中。
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafaka_topic_partition.png)
+![](images/kafaka_topic_partition.png)
 - 这样，消息就以一个个id的方式，组织起来。
     1. producer选择一个topic，生产消息，消息会通过分配策略append到某个partition末尾。
     2. consumer选择一个topic，通过id指定从哪个位置开始消费消息，消费完成之后，保留id，下次可以从这个位置开始继续消费，也可以从其他任意位置开始消费。
@@ -51,7 +51,7 @@ Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持�
     5. 保证消息可靠性。消息消费完成之后不会删除，可以通过重置offset重新消费，保证了消息不会丢失。
     6. 灵活的持久化策略。可以通过指定时间段（如最近一天）来保存消息，节省broker存储空间。
     7. 备份高可用性。消息以partition为单位分配到多个server，并以partition为单位进行备份。备份策略为：1个leader和N个followers，leader接受读写请求，followers被动复制leader。leader和followers会在集群中打散，保证partition高可用。
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_partitions.png)
+![](images/kafka_partitions.png)
 
 ***
 #### 4.2. Producer
@@ -61,8 +61,6 @@ Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持�
     3. key：根据该key将消息分区到不同的partition
     4. message：消息的内容
 
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_producer.png)
-
 ![](images/kafka_producer.png)
 
 ***
@@ -71,14 +69,14 @@ Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持�
     1. 队列
     2. 发布订阅
 > kafka通过**consumer groupZ**将两种模式统一处理：每个consumer将自己标记consumer group名称，之后系统会将consumer group按名称分组，将消息复制并分发给所有分组，每个分组只有一个consumer能消费这条消息。
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_consumer.png)
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_consumer-group.png)
+![](images/kafka_consumer.png)
+![](images/kafka_consumer-group.png)
 - 于是推理出两个极端情况：
     - 当所有的consumer的consumer grouop相同时，一个消息只能被其中一个consumer消费，系统变成队列模式
     - 当每个consumer的consumer group都不相同时，如果group都订阅了此topic，那么一个消息可以被所有的consumer消费， 系统变成发布订阅
 - 注意：
     1. consumer groups 提供了topics和 partitions的隔离，如上图consumer group-c2挂掉，consumer-c1会接收配p1,p2,即一个consumer grouoip 中 有其他consumer挂掉后能够重新平衡。如下图：
-    ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka_consumer-group-balance.png)
+    ![](images/kafka_consumer-group-balance.png)
     2. 多consumer并发消费消息，容易导致消息乱序，通过限制消费者为同步，但是这大大降低了程序的并发性。
     > kafka通过partition的概念，保证了partition内消息有序性，缓解了上面的问题。partition内消息会复制分发给所有分组，每个分组只有一个consumer能消费这条消息。这个语义保证了某个分组消费某个分区的消息，是同步而非并发的。如果一个topic只有一个partition，那么这个topic并发消费有序，否则只是单个partition有序。
 - 一般消息系统，consumer存在两种消费模型：
@@ -95,7 +93,7 @@ Kafka所采用的就是发布/订阅模式，被称为一种高吞吐量、持�
 
 
 #### 4.5. consumer、consumer group、partition、topic的关系
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/kafka-topic-consumer.jpg)
+![](images/kafka-topic-consumer.jpg)
 每个group中可以有多个consumer，每个consumer属于一个consumer group；
 通常情况下，一个group中会包含多个consumer，这样不仅可以提高topic中消息的并发消费能力，而且还能提高"故障容错"性，如果group中的某个consumer失效那么其消费的partitions将会有其他consumer自动接管。
 

@@ -25,10 +25,10 @@
 - 运行时数据区（内存结构）
 - 执行引擎
 - 
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/jvm-all.png)
+![](images/jvm-all.png)
 
 ### 2. 类加载子系统
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/jvm-classLoad.png)
+![](images/jvm-classLoad.png)
 #### 2.1. 加载
 - 将.class文件从磁盘中读到内存
 #### 2.2. 连接
@@ -49,7 +49,7 @@
   - ①.该类的全限定类名
   - ②.加载该类的类加载器
 
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/classLoadType.png)
+![](images/classLoadType.png)
 
 1. 启动类加载器（Bootstrap ClassLoader）
     > 负责加载JRE中核心类库，如JRE目录下的rt.jar等
@@ -68,7 +68,7 @@
 2. 把这个请求委托给父加载器去完成，一直向上委托，直到启动类加载器；
 3. 启动器加载器检查能不能加载（使用findClass()方法），能就加载（结束）；否则，抛出异常，通知子加载器进行加载。
 4. 重复步骤三；
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/parentLoadRule.png)
+![](images/parentLoadRule.png)
 
 #### 4.2. 优点
 1. 可以避免重复加载，父类已经加载了，子类就不需要再次加载

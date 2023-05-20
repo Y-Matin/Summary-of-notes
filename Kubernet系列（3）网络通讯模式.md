@@ -34,7 +34,7 @@
 - 他的功能是让集群中不同节点主机创建的Docker容器都具有全集群唯一的虚拟IP地址
 - 这些IP地址之间建立一个覆盖网络（Over Network），通过这覆盖网络，将数据包原封不动的传递到目标容器内
 - Flannel通过给每台宿主机分配一个子网的方式为容器提供虚拟网络，它基于Linux TUN/TAP，使用UDP封装IP包来创建overlay网络，并借助etcd维护网络的分配情况。
-- ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/flannel.png)
+- ![](images/flannel.png)
 #### 目的
 - Flannel设计目的就是为集群中所有节点重新规划IP地址的使用规则，**从而使得不同节点上的容器能够获得"同属一个内网"且"不重复的"IP地址，并让属于不同节点上的容器能够直接通过内网IP通信。**
 - 简单来说，它的功能是**让集群中的不同节点主机创建的Docker容器都具有全集群唯一的虚拟IP地址**。

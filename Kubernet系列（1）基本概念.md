@@ -19,7 +19,7 @@
 - Kubernetes是一个开源的，用于管理云平台中多个主机上的容器化的应用，Kubernetes的目标是让部署容器化的应用简单并且高效（powerful）,Kubernetes提供了应用部署，规划，更新，维护的一种机制。
 - Kubernetes一个核心的特点就是能够自主的管理容器来保证云平台中的容器按照用户的期望状态运行着（比如用户想让apache一直运行，用户不需要关心怎么去做，Kubernetes会自动去监控，然后去重启，新建，总之，让apache一直提供服务），管理员可以加载一个微型服务，让规划器来找到合适的位置，同时，Kubernetes也系统提升工具以及人性化方面，让用户能够方便的部署自己的应用（就像canary deployments）
 ### 2. 架构图
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/K8s架构图.png)
+![](images/K8s架构图.png)
 ### 3. 重要概念
 > 在这张系统架构图中，我们把服务分为运行在工作节点上的服务和组成集群级别控制板的服务。
 
@@ -49,9 +49,9 @@
 - **Fluentd-elasticsearch**：提供集群日志采集、存储与查询
   **高可用集群副本数据最好是>=3 （奇数个）**
 
-  ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/k8s-master.png)
+  ![](images/k8s-master.png)
   ****
-  ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/k8s-node.png)
+  ![](images/k8s-node.png)
 
 
 

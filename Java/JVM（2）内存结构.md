@@ -21,11 +21,11 @@
 > 3. OutOfMemoryError的异常到底涉及到运行时数据的哪块区域？该怎么解决呢？
 
 ### 2. JVM 内存结构
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/JVM_detail.png)
+![](images/JVM_detail.png)
 ***
 **方法区和堆是所有线程共享的内存区域；而java栈、本地方法栈和程序员计数器是运行是线程私有的内存区域。**
 ***
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/jvm-runData.png)
+![](images/jvm-runData.png)
 
 #### 2.1. Java堆（Heap）
 1. Java堆（Java Heap）是Java虚拟机所管理的内存中最大的一块。
@@ -46,7 +46,7 @@
 #### 2.4. 虚拟机栈
 1. Java虚拟机栈（Java Virtual Machine Stacks）也是线程私有的，它的生命周期与线程相同。虚拟机栈描述的是Java方法执行的内存模型：每个方法被执行的时候都会同时创建一个栈帧（Stack Frame）用于存储局部变量表、操作栈、动态链接、方法出口等信息。每一个方法被调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程。 
    
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/stackFrame.jpg) 
+![](images/stackFrame.jpg) 
 1. 局部变量表存放了编译期可知的各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型，它不等同于对象本身，根据不同的虚拟机实现，它可能是一个指向对象起始地址的引用指针，也可能指向一个代表对象的句柄或者其他与此对象相关的位置）和returnAddress类型（指向了一条字节码指令的地址）。
 
 2. 在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常
@@ -63,7 +63,7 @@
 
 
 ### 3. JVM常见参数以及对应空间位置
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/JVM-param.png)
+![](images/JVM-param.png)
 **控制参数**
 - -Xms设置堆的最小空间大小。
 - -Xmx设置堆的最大空间大小。

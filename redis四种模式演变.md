@@ -31,7 +31,7 @@
 - 前者称为主节点(master)，后者称为从节点(slave)；数据的复制是单向的，只能由主节点到从节点。
 - 在主从模式中，一般都会考虑 一个master挂在多个slave节点，当master服务宕机，会选举产生一个新的master，从而保证服务的高可用性。
 
-![主从模式部署图](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/redis_master-slave.jpg)
+![主从模式部署图](images/redis_master-slave.jpg)
 
 #### 2.1. 配置
 ```yml
@@ -56,7 +56,7 @@
 但是有一个问题，主节点的IP已经变动了，此时应用服务还是拿着原主节点的地址去访问，这...  
 于是，在Redis 2.8版本开始引入，就有了哨兵这个概念。  
 在复制的基础上，哨兵实现了自动化的故障恢复。  
-![哨兵模式部署图](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/redis_sentinel.jpg)
+![哨兵模式部署图](images/redis_sentinel.jpg)
 如上图所示：哨兵节点由两部分组成，哨兵节点和数据节点：
 - 1. 哨兵节点： 哨兵系统由一个或多个哨兵节点组成，哨兵节点是特殊的redis节点，不存储数据。
 - 2. 数据节点：主节点和从节点都是数据节点。
@@ -67,7 +67,7 @@
  > **reids的sentinel的最小配置是一主一从**
  #### 哨兵模式监控的原理
  
- ![哨兵模式原理图](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/redis_master-sentinel-detail.jpg)
+ ![哨兵模式原理图](images/redis_master-sentinel-detail.jpg)
  - 交互流程：
     1. 每个Sentinel以每秒钟一次的频率，向它**所有的主服务器、从服务器以及其他Sentinel实例**发送一个**Ping**命令。
     2. 如果一个实例（instance）距离最后一次有效回复Ping命令的时间超过down-after-milliseconds所指定的值，那么这个实例会被Sentinel标记为**主观下线**
@@ -95,9 +95,9 @@
 HASH_SLOT = CRC16(key) & 16384 
 ```
 这里用了**位运算**得到取模结果，位运算的速度高于取模运算。
- ![数据分片算法](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/redis_cluster-slots.jpg)
+ ![数据分片算法](images/redis_cluster-slots.jpg)
 ##### 4.1.2. 数据分片后如何查，怎么写？
- ![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/redis_cluster-slots-rdwr.jpg)
+ ![](images/redis_cluster-slots-rdwr.jpg)
  读请求分配给slave节点，写请求分配给master，数据同步从master到slave节点，读写分离提高并发能力，此功能有主从模式提供。
 ##### 4.1.3. 如何做到水平扩展
   当你新增一个master节点，需要做数据迁移，意味着redis的槽被分为三段，假设三段分别是0-7000、7001-1200、12001-16383。
@@ -105,7 +105,7 @@ HASH_SLOT = CRC16(key) & 16384
   槽需要重新分配，数据也需要重新迁移，但是服务不需要下线。
   redis集群的重新分片有redis内部的管理软件redis-trib负责执行。reids提供了重新分片的所有命令，redis-trib通过向节点发送命令来进行重新分片。
 ##### 4.1.4. 如果做到故障转移
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/redis_cluster_fixError.jpg)
+![](images/redis_cluster_fixError.jpg)
 - 假如途中红色的节点故障了，此时master3下面的从节点会通过 选举 产生一个主节点。替换原来的故障节点。此过程和哨兵模式的故障转移是一样的。
 
 ### 5. 总结

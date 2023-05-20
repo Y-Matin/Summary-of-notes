@@ -29,9 +29,9 @@
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 ```
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/spring-boot启动.png)
+![](images/spring-boot启动.png)
 ***
-![](https://yds-01.coding.net/p/Summary-of-notes/d/Summary-of-notes/git/raw/master/images/spring-boot-setListeners.png)
+![](images/spring-boot-setListeners.png)
 
 2. 执行run方法
 ```java
