@@ -18,3 +18,18 @@
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 ```
+
+
+
+##### 坑点
+- 1 ： kubebuilder的版本和golang的版本不匹配，可以看kubebuilder的go mod查看
+- 2 kubebuilder的init失败，go get 失败，报错 not file or dir， 或则 cant open /home/zic
+  - 可以看下 go env的环境变量，是否是路径配置问题
+  - ```golang
+  $ go env |grep zic
+    GOMODCACHE="/home/zic/gopath/pkg/mod"
+    GOPATH="/home/zic/gopath"
+  ```
+
+- kubebuilder create api command results in "cgo_linux.go:12:8: no such package located"
+  - gcc 的问题 
