@@ -120,7 +120,7 @@ ENTRYPOINT ["s3cmd"]
 CMD [--help"]
 
 #### cmd 和endpoint的区别
-- 1、CMD指令指定的容器启动时命令可以被docker run指定的命令覆盖ENTRYPOINT指令指定的命令不能被覆盖，而是将docker run指定的参数当做ENTRYPOINT指定命令的参数。
+- 1、CMD指令指定的容器启动时命令可以被docker run指定的命令覆盖,ENTRYPOINT指令指定的命令不能被覆盖，而是将docker run指定的参数当做ENTRYPOINT指定命令的参数。
 - 2、CMD与ENTRYPOINT同时存在时，CMD指令可以为ENTRYPOINT指令设置默认参数，而且CMD可以被docker run指定的参数覆盖；
 
 ##### Dockerfile最佳实践
@@ -142,7 +142,8 @@ CMD [--help"]
 
 
 
-#### 打包
+#### 打包  
+- 文件名："Dockerfile"
 ```
 docker build -t martinyds/ingress-manager:1.0.0 .
 docker push martinyds/ingress-manager:1.0.0
