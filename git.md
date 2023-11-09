@@ -1,6 +1,9 @@
 1.	撤销add操作： 
     git reset HEAD 如果后面什么都不跟的话 就是上一次add 里面的全部撤销了 
     git reset HEAD XXX/XXX/XXX.java 就是对某个文件进行撤销了
+2.  撤销本地已追踪文件，有更改但未commit
+    git checkout .  范围为当前目录下的文件
+    git checkout -- . 范围是当前整个工作区的文件
 2.	撤销commit操作
     git log 查看节点
     git reset commit_id （回退到上一个提交的节点 代码还是原来你修改的）
