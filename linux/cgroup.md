@@ -15,8 +15,16 @@ cgroup v2 对 cgroup v1 进行了多项改进，例如：
 一些 Kubernetes 特性专门使用 cgroup v2 来增强资源管理和隔离。 例如，MemoryQoS 特性改进了内存 QoS 并依赖于 cgroup v2 原语。
 
 #### 版本判断 
-- group 版本取决于正在使用的 Linux 发行版和操作系统上配置的默认 cgroup 版本。 要检查你的发行版使用的是哪个 cgroup 版本，请在该节点上运行 `stat -fc %T /sys/fs/cgroup/`  命令：
+- group 版本取决于正在使用的 Linux 发行版和操作系统上配置的默认 cgroup 版本。 要检查你的发行版使用的是哪个 cgroup 版本，请在该节点上运行命令：
+  `stat -fc %T /sys/fs/cgroup/`
   - 对于 cgroup v2，输出为 cgroup2fs。
   - 对于 cgroup v1，输出为 tmpfs。 
+
+- 也可以查看 ,有存在同时启动v1 v2的情况（一致wsl的ubuntu20有该情况）
+  ```
+  martin@Thinkpad-T470p:~$ mount|grep cgroup
+  cgroup2 on /sys/fs/cgroup type cgroup2 (rw,nosuid,nodev,noexec,relatime)
+
+  ```
 
 #### 驱动分类

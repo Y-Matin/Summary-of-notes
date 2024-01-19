@@ -5,7 +5,7 @@ DaltaFIFO
   - UndeltaStore：实现Store，利用Cache存放数据，数据变更时通过PushFunc发送当前完整状态
   - FIFO： 实现Queue（包含Store），利用自己内部的items数据结构存放数据
   -  DeltaFIFO： 
-  -  Heap：实现Store，利用data数据结构，存放数据，实现堆数据结构，用于优先队列
+  -  Heap：实现Store，利用data数据结构，存  数据，实现堆数据结构，用于优先队列
   -  ExpirationCache：实现Store，利用threadSafeMap存放数据
   
 
