@@ -6,7 +6,10 @@
 - 获取url的路径参数
 > 路径申明：/userTest/:userId  
 > 获取参数context.Param("userId")
-> 
+
+- 获取get 请求url后的?name=ss参数
+> context.Query("name")  
+
 - 获取body里面参数
 > postForm（“key”）  可以解析 form-data， 和 www-form-urlencoded两种type
 - 对接json格式的 body    
