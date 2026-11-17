@@ -122,7 +122,7 @@ go get github.com/cloudwego/eino
 
 #### 学习目标
 
-把 Demo 改成生产级可上线服务，掌握 Gin 接口、日志链路追踪、权限安全、Docker 部署，横向了解 Go 主流 Agent 框架。
+把 Demo 改成生产级可上线服务，掌握 Gin 接口、日志链路追踪、权限安全、Docker 部署，横向了解 Go 主流 Agent 框架。 
 
 #### 本周必看教程和资料
 
